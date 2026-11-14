@@ -1,6 +1,6 @@
 # CodeCoopSpace-NASA
 
-Base de trabajo de **CodeCoop Space** para [Field Shift: Adapting Farms with NASA Data](https://www.spaceappschallenge.org/2026/challenges/field-shift-adapting-farms-with-nasa-data/), NASA Space Apps 2026, San Salvador.
+Base de trabajo de [CodeCoop Space](https://www.spaceappschallenge.org/2026/find-a-team/codecoop-space/) para [Field Shift: Adapting Farms with NASA Data](https://www.spaceappschallenge.org/2026/challenges/adapting-farms-with-nasa-data/), NASA Space Apps 2026, San Salvador. La demo abre directamente en el recorrido agrícola y funciona sin cuentas de usuario.
 
 Queremos que una persona que cultiva granos básicos pueda comparar su rotación actual con alternativas, ver cómo cambian los resultados según su suelo y prioridades, y entender qué viene de datos NASA y qué depende de supuestos.
 
@@ -9,7 +9,7 @@ Queremos que una persona que cultiva granos básicos pueda comparar su rotación
 1. Abre el [Kanban](https://github.com/users/MateoCanales007/projects/10/views/2), elige una tarea disponible y avisa a Mateo si cambia el alcance o bloquea una entrega.
 2. Lee el [alcance del prototipo](docs/RETO.md). Si usas un asistente, comparte el issue y las [instrucciones comunes](AGENTS.md). La [guía de inicio](ai/INICIO.md) cubre Claude Code con Haiku, GitHub Copilot y otros clientes.
 3. Usa el [contrato compartido](docs/CONTRATO.md) para coordinar frontend, API, datos y cálculo. Su estado inicial es una propuesta para aprobación del equipo.
-4. Revisa [equipo y tiempos](docs/EQUIPO.md), [datos y método](docs/DATOS-Y-METODO.md) y [entrega](docs/ENTREGA.md) según tu tarea.
+4. Consulta [ofertas, fuentes y materiales oficiales](docs/EVENTO.md), [equipo y tiempos](docs/EQUIPO.md), [datos y método](docs/DATOS-Y-METODO.md) y [entrega](docs/ENTREGA.md) según tu tarea.
 
 ## Ejecutar en local
 

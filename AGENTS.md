@@ -9,6 +9,8 @@
 
 ## Reglas de producto y datos
 
+- El prototipo permite entrar directamente al formulario y comparar rotaciones sin registro, perfiles ni sesiones de usuario. Cualquier credencial de un proveedor meteorológico pertenece al servidor.
+
 - Prototipo de exploración de rotaciones para un caso salvadoreño. Presenta rutas comparables, evidencia, incertidumbre y factores que el agricultor puede cambiar.
 - Distingue clima histórico de escenarios, y datos NASA de observaciones locales y supuestos. Cita producto, versión disponible, periodo, unidades y escala; una celda climática no mide una parcela. Reconoce cuando faltan datos.
 - Verifica valores agrícolas en fuentes primarias y registra página/tabla, contexto y unidades. Las muestras y reglas ilustrativas deben identificarse como tales. Separa cálculos reproducibles del texto interpretativo.

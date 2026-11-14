@@ -1,6 +1,6 @@
 # Field Shift — alcance de la demo
 
-El [enunciado oficial](https://www.spaceappschallenge.org/2026/challenges/field-shift-adapting-farms-with-nasa-data/) pide combinar observaciones terrestres de NASA, información de suelo local, características de cultivos y prioridades agrícolas para explorar rotaciones frente a condiciones cambiantes. Es una comparación de decisiones de manejo en el tiempo y su evidencia.
+El [enunciado oficial](https://www.spaceappschallenge.org/2026/challenges/adapting-farms-with-nasa-data/) pide combinar observaciones terrestres de NASA, información de suelo local, características de cultivos y prioridades agrícolas para explorar rotaciones frente a condiciones cambiantes. Es una comparación de decisiones de manejo en el tiempo y su evidencia.
 
 **Usuario inicial:** agricultor de granos básicos o técnico que asesora a una familia productora en El Salvador. Caso inicial propuesto: un sitio representativo de San Miguel con entrada de suelo confirmada por el usuario o marcada como hipotética para la demo.
 
