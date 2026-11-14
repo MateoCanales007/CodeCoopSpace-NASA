@@ -1,0 +1,24 @@
+{
+  "provenance": {
+    "product": "NASA POWER Daily API",
+    "apiVersion": "v2.10.3",
+    "sources": ["MERRA2", "POWER"],
+    "url": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M_MAX,T2M_MIN,PRECTOTCORR&community=AG&longitude=-88.45&latitude=13.64&start=20240501&end=20240507&format=JSON",
+    "retrievedDate": "2026-11-14",
+    "latitude": 13.64,
+    "longitude": -88.45,
+    "timeStandard": "LST",
+    "fillValue": -999.0,
+    "use": "Connectivity sample; rows transcribed from the API, not a seasonal reference."
+  },
+  "units": {"tMaxC": "degC", "tMinC": "degC", "precipMmPerDay": "mm/day"},
+  "days": [
+    {"date": "2024-05-01", "tMaxC": 33.90, "tMinC": 25.88, "precipMmPerDay": 3.34},
+    {"date": "2024-05-02", "tMaxC": 32.54, "tMinC": 26.23, "precipMmPerDay": 8.76},
+    {"date": "2024-05-03", "tMaxC": 33.99, "tMinC": 25.43, "precipMmPerDay": 0.54},
+    {"date": "2024-05-04", "tMaxC": 32.33, "tMinC": 26.74, "precipMmPerDay": 2.50},
+    {"date": "2024-05-05", "tMaxC": 32.49, "tMinC": 26.35, "precipMmPerDay": 2.99},
+    {"date": "2024-05-06", "tMaxC": 32.73, "tMinC": 25.89, "precipMmPerDay": 0.02},
+    {"date": "2024-05-07", "tMaxC": 33.78, "tMinC": 25.80, "precipMmPerDay": 0.04}
+  ]
+}
