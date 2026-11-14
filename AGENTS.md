@@ -3,7 +3,7 @@
 ## Arranque de cada tarea
 
 1. Lee el issue, `git status --short --branch` y [docs/RETO.md](docs/RETO.md).
-2. Abre la sección asignada en [ai/ROLES.md](ai/ROLES.md) y únicamente las partes del [contrato](docs/CONTRATO.md) o del [método](docs/DATOS-Y-METODO.md) que afecte la tarea. Consulta [docs/DECISIONES.md](docs/DECISIONES.md) si hay una discrepancia.
+2. Abre únicamente las partes del [contrato](docs/CONTRATO.md) o del [método](docs/DATOS-Y-METODO.md) que afecte la tarea. Consulta [docs/DECISIONES.md](docs/DECISIONES.md) si hay una discrepancia.
 3. Confirma que tu rama corresponde al issue. Respeta archivos con trabajo ajeno y revisa los cambios antes de editar.
 4. Implementa la porción más pequeña que cumpla la aceptación del issue. Usa los comandos del [README](README.md) y registra resultados observados.
 
@@ -16,7 +16,7 @@
 
 ## Colaboración
 
-- Mateo dirige el alcance, integración y envío. Cada issue tiene una persona responsable. PR contra `main` con `Closes #N`, prueba reproducible y un revisor de otra área si toca su interfaz.
+- Abre un PR contra `main` con `Closes #N` y una prueba reproducible. Si cambia una interfaz compartida, coordina la revisión en el issue.
 - Frontend usa componentes React Native compatibles con web y móvil. Backend valida entradas y calcula resultados. Si cambias un contrato, actualiza su documento y coordina con el agente consumidor en el mismo PR o issue.
 - Conserva el historial ajeno. Evita reformateos masivos y cambios paralelos sobre el mismo archivo. Las decisiones nuevas se registran en docs/DECISIONES.md. Lleva secretos y accesos por canales privados.
 - Documenta el uso de IA que deba declarar el equipo en [docs/ENTREGA.md](docs/ENTREGA.md). Un PR con cálculos científicos necesita un ejemplo comprobable y los supuestos explícitos.

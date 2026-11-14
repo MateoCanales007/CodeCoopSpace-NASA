@@ -1,17 +1,6 @@
 # Equipo y plan
 
-Mateo coordina integración, decisiones de alcance y entrega. El equipo asigna nombres en GitHub al arrancar. Los seis roles son responsabilidades, no una asignación de cuentas.
-
-| Rol | Área de trabajo | Primer resultado que desbloquea al resto |
-| --- | --- | --- |
-| Mateo — dirección | Reto, contrato, integración, presentación | Caso piloto y aceptación consensuados |
-| Datos NASA | Fuentes, muestras y lectura climática | Serie versionada, cobertura y unidades |
-| Ciencia agrícola | Fuentes CENTA, suelo, candidatos y criterios | Matriz de evidencias y ejemplo verificable |
-| Backend | `services/api`, validación y cálculo | Resultado con contrato acordado |
-| Frontend | `apps/frontend`, formulario y comparación | Recorrido navegable reutilizando componentes universales |
-| QA y relato | Casos, accesibilidad, evidencia y demo | Escenario ejecutable y revisión de la entrega |
-
-Con cinco personas, Mateo absorbe el relato y una persona de frontend o datos ejecuta la verificación cruzada. Si hay dos personas en frontend, separen formulario y resultados por archivo y acuerden sus props antes de editar.
+El equipo coordina las tareas directamente en el [Kanban](https://github.com/users/MateoCanales007/projects/10/views/2). Si dos tareas tocan el mismo archivo o contrato, acuerden el cambio en el issue antes de editar.
 
 ## Durante el evento — hora de El Salvador
 

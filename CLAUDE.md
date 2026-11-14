@@ -1,3 +1,3 @@
 @AGENTS.md
 
-Usa el issue asignado como alcance. Abre los documentos enlazados por su rol según sea necesario; deja el traspaso en GitHub para que otro agente pueda retomar.
+Usa el issue como alcance y consulta solo los documentos relevantes. En sesiones con Haiku, delimita el cambio con los criterios de aceptación y los archivos implicados. Deja el traspaso en GitHub para que el equipo pueda retomar.

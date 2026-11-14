@@ -7,7 +7,7 @@ Queremos que una persona que cultiva granos básicos pueda comparar su rotación
 ## Empieza aquí
 
 1. Abre el [Kanban](https://github.com/users/MateoCanales007/projects/10/views/2), elige una tarea disponible y avisa a Mateo si cambia el alcance o bloquea una entrega.
-2. Lee el [alcance del prototipo](docs/RETO.md) y sigue las [instrucciones para IA](AGENTS.md) si vas a trabajar con un asistente.
+2. Lee el [alcance del prototipo](docs/RETO.md). Si usas un asistente, comparte el issue y las [instrucciones comunes](AGENTS.md). La [guía de inicio](ai/INICIO.md) cubre Claude Code con Haiku, GitHub Copilot y otros clientes.
 3. Usa el [contrato compartido](docs/CONTRATO.md) para coordinar frontend, API, datos y cálculo. Su estado inicial es una propuesta para aprobación del equipo.
 4. Revisa [equipo y tiempos](docs/EQUIPO.md), [datos y método](docs/DATOS-Y-METODO.md) y [entrega](docs/ENTREGA.md) según tu tarea.
 
@@ -44,6 +44,6 @@ Verificación frontend: `npm run typecheck` y `npm run build:web`. El export est
 | `services/api/` | Python + FastAPI para datos, validación HTTP y comparación |
 | `data/samples/` | Muestras acotadas de NASA con procedencia |
 | `docs/` | Requisitos, decisiones, método, contratos y entrega |
-| `ai/` | Guía por rol, plantilla de inicio y traspasos |
+| `ai/` | Guía de inicio para asistentes y plantilla de traspaso |
 
 El evento local anuncia el cierre el **15 de noviembre de 2026 a las 11:59 p. m.** en El Salvador. Revisen primero si el coordinador local les dio un corte anterior para el pitch. [Evento oficial en San Salvador](https://www.spaceappschallenge.org/2026/local-events/san-salvador/).
