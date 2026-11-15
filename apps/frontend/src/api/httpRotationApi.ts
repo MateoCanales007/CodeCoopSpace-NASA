@@ -1,6 +1,6 @@
 import type { Language } from '../i18n/types';
 import { ApiError } from './ApiError';
-import { normalizeCompareResponse, normalizeSites } from './normalize';
+import { normalizeCompareResponse, normalizeComplementaryClimate, normalizeCurrentWeather, normalizeSites } from './normalize';
 import type { RotationApi } from './rotationApi';
 
 interface HttpOptions {
@@ -8,8 +8,11 @@ interface HttpOptions {
   timeoutMs?: number;
 }
 
-/** Talks to the team backend following docs/CONTRATO.md. */
-export function createHttpRotationApi({ baseUrl, timeoutMs = 8000 }: HttpOptions): RotationApi {
+/**
+ * Talks to the team backend following docs/CONTRATO.md.
+ * The timeout is generous: the first comparison of an area waits for NASA POWER and for the explanation.
+ */
+export function createHttpRotationApi({ baseUrl, timeoutMs = 30000 }: HttpOptions): RotationApi {
   const root = baseUrl.replace(/\/$/, '');
 
   async function request(path: string, language: Language, init?: RequestInit): Promise<unknown> {
@@ -42,6 +45,20 @@ export function createHttpRotationApi({ baseUrl, timeoutMs = 8000 }: HttpOptions
     async compareRotations(body, language) {
       const path = '/v1/compare';
       return normalizeCompareResponse(await request(path, language, { method: 'POST', body: JSON.stringify(body) }), path);
+    },
+    async getCurrentWeather(siteId, language) {
+      const path = '/v1/weather/current';
+      const url = path + '?siteId=' + encodeURIComponent(siteId);
+      return normalizeCurrentWeather(await request(url, language), path);
+    },
+    async getComplementaryClimate(query, language) {
+      const path = '/v1/climate/meteomatics';
+      // Only the values the caller knows are sent; the server has defaults for the rest.
+      const params = Object.entries(query)
+        .filter(([, value]) => (typeof value === 'number' ? Number.isFinite(value) : Boolean(value)))
+        .map(([key, value]) => `${key}=${encodeURIComponent(String(value))}`);
+      const url = params.length > 0 ? `${path}?${params.join('&')}` : path;
+      return normalizeComplementaryClimate(await request(url, language), path);
     },
   };
 }

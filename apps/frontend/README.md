@@ -2,7 +2,7 @@
 
 React Native + Expo + TypeScript app for web, Android and iOS. Yago helps a farmer in El Salvador compare the current crop rotation with two alternatives according to water, soil and what matters most to them.
 
-The app opens directly: no accounts, profiles or sessions. It runs on bundled demo data until the backend is connected.
+The app opens directly: no accounts, profiles or sessions. It bundles no data: the areas, the comparison, its explanation and the weather come from the team's FastAPI server (`services/api`). Without the server the screens say so and offer to try again.
 
 ## Run it
 
@@ -12,6 +12,8 @@ npm ci
 npm run web        # http://localhost:8081
 ```
 
+Start the server too (see the root [README](../../README.md)); on the web the app looks for it on the same host, port 8000.
+
 | Command | What it does |
 | --- | --- |
 | `npm run web` | Expo dev server for the browser |
@@ -19,13 +21,13 @@ npm run web        # http://localhost:8081
 | `npm run typecheck` | TypeScript in strict mode |
 | `npm run build:web` | Static export to `dist/` |
 | `npm run check:api` | Checks a running backend against what the frontend expects |
-| `npm run examples:api` | Regenerates the JSON examples in `docs/examples` |
+| `npm run examples:api` | Saves real answers of a running backend in `docs/examples` |
 
-To open it on a phone in the same Wi-Fi, use the LAN address Expo prints. If port 8081 is taken: `npx expo start --web --port 8090`.
+To open it on a phone in the same Wi-Fi, use the LAN address Expo prints and start the server with `--host 0.0.0.0`. If port 8081 is taken: `npx expo start --web --port 8090`.
 
-## Connecting the backend
+## The backend
 
-Read [`docs/API_INTEGRATION.md`](docs/API_INTEGRATION.md). In short: set `EXPO_PUBLIC_USE_API=1` and `EXPO_PUBLIC_API_URL` in `.env.local`, restart Expo and run `npm run check:api`. The single connection point is [`src/api/index.ts`](src/api/index.ts).
+Read [`docs/API_INTEGRATION.md`](docs/API_INTEGRATION.md). The single connection point is [`src/api/index.ts`](src/api/index.ts); set `EXPO_PUBLIC_API_URL` in `.env.local` only when the server is not on the same host. `npm run check:api` checks a running server against what the app expects.
 
 ## Structure
 
@@ -39,7 +41,6 @@ docs/                   Backend integration guide and JSON examples
 scripts/                Node scripts (API check, example generator)
 src/
   api/                  Everything that talks to the backend
-    demo/               Bundled demo data and its illustrative rules
   components/
     ui/                 Small reusable pieces: text, buttons, badge, icon…
     scene/              Welcome stage: scenes, natural motion, sand transition
@@ -58,7 +59,7 @@ src/
 ## Conventions
 
 - **One responsibility per file.** Screens compose; components draw; hooks hold logic; `src/api` is the only place that knows about HTTP.
-- **Screens depend on `RotationApi`, not on `fetch`.** The real API, the demo data and the fallback are interchangeable implementations of that interface.
+- **Screens depend on `RotationApi`, not on `fetch`.** The HTTP client is one implementation of that interface; a test double can be another.
 - **Extend by adding, not by editing.** A new welcome scene is an entry in `components/scene/scenes.ts`; a new kind of motion is an entry in `sceneMotion.ts`; a new wizard step is an entry in `screens/wizard/steps.tsx`; a new language is a file in `i18n/`.
 - **No hard-coded text in components.** Every string lives in `src/i18n/en.ts` and `es.ts`; the `es` file is type-checked against `en`.
 - **Colors and fonts come from `src/theme`.** Ink and ivory dominate; leaf green and maize yellow only appear as a halo or a detail.
@@ -74,6 +75,8 @@ src/
 
 ## Data honesty
 
-- The demo case is fictitious (San Miguel, approximate public coordinates) and is labelled "Demo data" on screen.
-- The climate figures are a real NASA POWER sample for one week (May 1–7, 2024). It is past weather for a wide area, not a forecast and not a plot measurement.
-- Crop rules in `src/api/demo` are illustrative. No agronomic value has been taken from CENTA yet.
+- No figure, rating or explanation is written in the app: they all arrive from the server with their source, period and scale.
+- The weather is NASA POWER history for a cell of about 50 km, labelled as past weather, never a forecast or a plot measurement.
+- The "In short" card says whether an AI model (Groq) or the rules wrote the wording. The AI only words the calculated result.
+- Rules that are team assumptions are labelled "Method assumption" on screen. If the server falls back to its saved one-week sample, the screen shows "Demo mode".
+- Meteomatics weather is context only and is labelled as a second, modelled source that does not change the comparison.

@@ -1,28 +1,24 @@
-# Connecting the backend
+# How the frontend uses the backend
 
-Guide for the backend team. The frontend already runs the whole flow on bundled demo data; this document says exactly what it calls, what it needs back, and how to check your API against it.
+Everything the farmer sees comes from the team's FastAPI server (`services/api`): the areas, the comparison, its explanation and the weather. The app bundles no data. This guide says what the frontend calls, what it does with each field, and how to check a server against it.
 
-Source of truth for the contract is [`docs/CONTRATO.md`](../../../docs/CONTRATO.md) (status: proposal). This guide only adds what the frontend does with it.
+Source of truth for the contract is [`docs/CONTRATO.md`](../../../docs/CONTRATO.md). The method behind the figures is in [`docs/DATOS-Y-METODO.md`](../../../docs/DATOS-Y-METODO.md).
 
-## 1. Switch the frontend to your API
+## 1. Where the frontend finds the server
 
-Create `apps/frontend/.env.local` (it is git-ignored):
+Everything goes through one object, `rotationApi`, defined in [`src/api/index.ts`](../src/api/index.ts).
 
-```
-EXPO_PUBLIC_USE_API=1
-EXPO_PUBLIC_API_URL=http://127.0.0.1:8000
-```
+- **On the web, with no configuration:** the same host that serves the page, on port 8000. Open `http://<computer-ip>:8081` on a phone and the app calls `http://<computer-ip>:8000`.
+- **Explicit address:** set `EXPO_PUBLIC_API_URL` in `apps/frontend/.env.local` (git-ignored) and restart Expo. Needed for native builds or when the server lives elsewhere.
+- **CORS:** in development the API accepts origins from private networks. For a public deployment, set `FIELD_SHIFT_WEB_ORIGIN_REGEX` to empty and list exact origins in `FIELD_SHIFT_WEB_ORIGINS` on the server.
+- From a phone, start Uvicorn with `--host 0.0.0.0`.
+- Every `EXPO_PUBLIC_*` variable is visible to clients. Keys (Groq, Meteomatics) stay in `services/api/.env`.
 
-Restart Expo (`npm run web`). No screen or component changes: everything goes through one object, `rotationApi`, defined in [`src/api/index.ts`](../src/api/index.ts).
+If the server cannot be reached, the wizard and the results say so and offer a retry button. Nothing is made up. The reason is logged in the browser console with the `[Yago]` prefix.
 
-- If a call fails, times out (8 s) or returns something that does not match the contract, the app falls back to the demo data and shows a warning at the bottom of the results. The reason is logged in the browser console with the `[Yago]` prefix.
-- **CORS:** the API allows `http://localhost:8081` and `http://127.0.0.1:8081` by default. If Expo runs on another port or you open it from a phone, add that exact origin to `FIELD_SHIFT_WEB_ORIGINS` on the server.
-- From a phone, use the LAN IP of the machine in `EXPO_PUBLIC_API_URL` and start Uvicorn with `--host 0.0.0.0`.
-- Every `EXPO_PUBLIC_*` variable is visible to clients. Provider credentials (for example Meteomatics) stay on the server.
+## 2. Check a server
 
-## 2. Check your API
-
-With your server running:
+With the server running:
 
 ```powershell
 cd apps/frontend
@@ -30,104 +26,91 @@ npm run check:api                           # http://127.0.0.1:8000
 npm run check:api -- http://192.168.1.20:8000
 ```
 
-It calls every endpoint, validates the responses with the same code the app uses and lists the optional fields you are not sending yet. Example output:
+It calls every endpoint, validates the responses with the same code the app uses and reports what is degraded. Example output:
 
 ```
 Checking http://127.0.0.1:8000
   ok    GET /health → 200
-  ok    GET /v1/sites → 1 site(s): san-miguel-demo
-  ok    POST /v1/compare → 3 scenario(s), climate "partial", 4 source(s)
-  note  optional fields not sent yet (the UI hides those parts): highlight, scenarios[].summary
+  ok    GET /v1/climate/meteomatics → "available", 7 of 7 day(s), 2024-05-01 to 2024-05-07
+  ok    end before start → 422
+  ok    GET /v1/sites → 14 site(s): san-miguel, ahuachapan, …
+  ok    POST /v1/compare → 3 scenario(s), climate "available", 7 source(s)
+  note  the explanation was written by the rules, not by Groq (not_configured)
+  ok    every optional field is present
   ok    duplicated priorities → 422
   ok    unsupported site → 422
 All required checks passed.
 ```
 
-## 3. Endpoints the frontend calls
+`npm run examples:api` saves real answers of the running server in [`docs/examples`](examples).
 
-Both requests send `Accept: application/json`, `Content-Type: application/json` and `Accept-Language: en` or `es`.
+## 3. Calls
+
+Every request sends `Accept: application/json`, `Content-Type: application/json` and `Accept-Language: en` or `es`. The request timeout is 30 s, because the first comparison of an area waits for NASA POWER and for the explanation.
 
 | Call | When | Example |
 | --- | --- | --- |
-| `GET /v1/sites` | Once when the app opens, and again if the language changes | [`sites.response.json`](examples/sites.response.json) |
-| `POST /v1/compare` | When the results open, and every time the farmer changes the priority, the answers or the language | [`compare.request.json`](examples/compare.request.json) → [`compare.response.json`](examples/compare.response.json) |
+| `GET /v1/sites` | When the app opens, and again if the language changes | [`sites.response.json`](examples/sites.response.json) |
+| `POST /v1/compare` | When the results open, and every time the farmer changes the priority, an answer or the language | [`compare.request.json`](examples/compare.request.json) → [`compare.response.json`](examples/compare.response.json), [`compare.response.es.json`](examples/compare.response.es.json) |
+| `GET /v1/climate/meteomatics` | After the comparison arrives, for the last 7 complete days at the area's approximate point | [`docs/CONTRATO.md`](../../../docs/CONTRATO.md) |
 
-Other examples: [`compare.response.minimal.json`](examples/compare.response.minimal.json) is the smallest response the UI accepts; [`compare.response.es.json`](examples/compare.response.es.json) is the same comparison in Spanish. Regenerate all of them with `npm run examples:api`.
-
-### Request
+### Comparison request
 
 ```json
 {
-  "siteId": "san-miguel-demo",
-  "currentCrop": "maize",
-  "soil": { "texture": "unknown", "drainage": "unknown" },
-  "priorities": ["soil", "water", "diversification"]
+  "siteId": "san-miguel",
+  "currentCrop": "sorghum",
+  "soil": { "texture": "unknown", "drainage": "good" },
+  "priorities": ["diversification", "water", "soil"]
 }
 ```
 
 - `priorities` always has the three values, without repeats. **The first one is what the farmer chose**; the other two follow in the default order.
-- `currentCrop`: `maize`, `bean` or `sorghum`.
-- `soil.texture`: `sandy`, `loam`, `clay` or `unknown`. `soil.drainage`: `good`, `poor` or `unknown`. The contract example only shows `unknown`; the other values are a proposal (see section 5).
+- `soil.texture`: `sandy`, `loam`, `clay` or `unknown`. `soil.drainage`: `good`, `poor` or `unknown`. "Not sure" is sent as `unknown`.
 
 ### Language
 
-The frontend translates its own labels (crop names, priorities, levels, source kinds). Free text written by the backend is shown as-is: `criteria[].reason`, `summary`, `limitation`, `missingData`, `sources[].name`, `sources[].note`, `climate.note`, `climate.alert.text`, `warnings[]` and `highlight.reason`. Return those in the language of `Accept-Language`, defaulting to English. If you only support one language for now, the app still works; those sentences simply will not switch.
+The frontend translates its own labels (crop names, priorities, levels, source kinds). Free text written by the server is shown as-is: `criteria[].reason`, `summary`, `limitation`, `missingData`, `sources[].name`, `sources[].note`, `climate.note`, `climate.periodLabel`, `climate.metrics[].label`, `climate.alert.text`, `warnings[]`, `highlight.reason` and the four `explanation` texts.
 
 ## 4. What the UI does with each field
 
-Required means the response is rejected without it (and the app falls back to demo data).
+Required means the response is rejected without it and the screen shows the error state with a retry button.
 
 | Field | Required | Used for |
 | --- | --- | --- |
 | `sites[].id`, `name` | yes | Area options in step 1 |
-| `sites[].crops` | no | Crops offered in step 2; all three when missing |
-| `sites[].department`, `isDemo` | no | Hint under the area name |
-| `scenarios[].id` | yes | Stable identity; also referenced by `highlight.scenarioId` |
-| `scenarios[].sequence` | yes | Card title, for example Maize → Beans |
-| `scenarios[].criteria[]` | yes | One pill per criterion |
+| `sites[].department`, `crops` | no | Hint under the area name; crops offered in step 2 |
+| `explanation` (`consider`, `influence`, `caution`, `verify`) | no | "In short" card at the top of the results. Hidden when missing |
+| `explanation.source`, `model`, `fallbackReason` | no | Says whether an AI model (Groq) or the rules wrote the wording, and why the AI was not used |
+| `scenarios[].id`, `sequence`, `criteria[]` | yes | One card per rotation, with one pill per criterion |
+| `scenarios[].role`, `summary`, `limitation`, `missingData`, `sourceIds` | no | Card tag, one-sentence explanation, "Watch out" block, source chips |
 | `criteria[].priority` | yes | `water`, `soil` or `diversification` |
-| `criteria[].level` | no | `favorable`, `neutral`, `unfavorable`; `null` shows "No data" |
-| `criteria[].reason` | no | Explanation inside "See why and the sources" |
-| `criteria[].evidence` | no | Source ids; decides which source chips the card shows |
-| `sources[]` (`id`, `name`, `url`, `version`, `kind`, `note`) | yes | Provenance chips, source list and links. `kind`: `nasa`, `local-reference`, `user-input`, `demo-assumption` |
-| `climate.status`, `period`, `coverage`, `sourceId` | yes (object) | Climate card: product, version, period and days with data |
-| `climate.metrics[]` | no | Looked up by `id`: `precipTotal` (mm), `dryDays`, `tMaxMean` (°C). A missing or `null` value shows "No data" |
-| `warnings[]` | no | Listed at the bottom of the results |
-| `methodVersion` | no | Shown in the disclaimer |
+| `criteria[].level`, `reason`, `evidence` | no | Pill (`null` shows "No data"), text inside "See why and the sources" |
+| `highlight` (`scenarioId`, `priority`, `reason`) | no | Dark "Best fit to …" card and the banner that explains what changed when the priority moves |
+| `sources[]` (`id`, `name`, `url`, `version`, `kind`, `note`) | yes | Provenance chips, source list and links |
+| `climate` (`status`, `kind`, `periodLabel`, `validYears`, `expectedYears`, `spatialScale`, `sourceId`) | yes (object) | Weather card: product, version, period, scale and years with data |
+| `climate.metrics[]` (`id`, `value`, `unit`, `total`, `label`, `reason`) | no | One figure each. `total` renders "3 of 10". A `null` value shows "No data" with its `reason` |
+| `climate.alert`, `note` | no | "Water alert" box; caveat under the figures |
+| `isDemo` | no | "Demo mode" badge, when the weather is the saved one-week sample |
+| `warnings[]`, `methodVersion` | no | Listed at the bottom; shown in the disclaimer |
+| Meteomatics `status`, `start`, `end`, `days[]` | yes | "Recent weather, second source" card. Days with `null` are skipped, never filled in |
+| Meteomatics `reason`, `coverage`, `provenance`, `stale` | no | Explanation when unavailable, days with data, source and retrieval date, saved-copy notice |
 
-## 5. Proposed extensions (not in the contract yet)
+## 5. Degraded answers the UI handles
 
-These fields make the results clearer for the farmer. The UI works without them, but please confirm or reject them in the contract issue so both sides stop guessing.
-
-| Field | What it enables | Without it |
+| Situation | Server answer | What the farmer sees |
 | --- | --- | --- |
-| `highlight: { scenarioId, priority, reason }` | Dark "Best fit to …" card and the banner that explains what changed when the priority moves. `reason` is a clause that completes "To save water, …" | No card is emphasised and no banner is shown |
-| `scenarios[].role`: `current` or `alternative` | Tags "What you do today" / "Another option" | Inferred: a sequence that repeats one crop is the current one |
-| `scenarios[].summary` | One-sentence explanation on the card | Hidden |
-| `scenarios[].limitation` | The "Watch out" line | Hidden |
-| `scenarios[].missingData` | What we still do not know for that option | Hidden |
-| `scenarios[].sourceIds` | Sources cited by the card | Derived from `criteria[].evidence` |
-| `climate.alert: { priority, text }` | "Water alert" box: how the NASA data affects the comparison | Hidden |
-| `climate.note` | Scale and period caveat under the climate figures | Hidden |
-| `isDemo` | "Demo data" badge on the results | No badge |
-| `soil.texture` / `soil.drainage` values other than `unknown` | Lets what the farmer knows change the comparison | Send `unknown` only |
+| Groq not configured, slow, rate limited or invalid | `explanation.source: "rules"` with `fallbackReason` | The same card, labelled "Automatic summary", with the reason in one line |
+| NASA POWER down, saved copy available | `climate.stale: true` | Weather card with a note that it is a saved copy |
+| NASA POWER down, only the one-week sample (San Miguel) | `climate.kind: "saved-sample"`, `isDemo: true` | "Demo mode" badge, "Saved weather sample" card, water shown as "No data" |
+| NASA POWER down, no copy | `climate.status: "unavailable"` | Figures show "No data" with the cause; water is "No data"; soil and diversification still rated |
+| "Not sure" answers | `missingData`, `warnings[]`, `explanation.verify` | Listed as things still to confirm; no option is penalised |
+| Meteomatics unavailable | `status: "unavailable"` with `reason` | The card explains why and shows no figures |
+| Invalid input (422) or server unreachable | HTTP error | Error state with a retry button |
 
-## 6. Errors
-
-| Status | Meaning | What the app does today |
-| --- | --- | --- |
-| 200 | Comparison, possibly partial, with `warnings` | Renders it |
-| 422 | Invalid input | Falls back to demo data with a warning; the request should never be invalid, so treat it as a bug |
-| 503 | A required source is unavailable and there is no valid copy | Falls back to demo data with a warning |
-| network error / timeout | Server unreachable | Falls back to demo data with a warning |
-
-The fallback keeps the hackathon demo alive. Once the API is stable, remove it by using `createHttpRotationApi` directly in [`src/api/index.ts`](../src/api/index.ts); the results screen already has an error state with a retry button.
-
-## 7. Adding an endpoint
+## 6. Adding an endpoint
 
 1. Add the request and response types to [`src/api/types.ts`](../src/api/types.ts).
 2. Add the method to the `RotationApi` interface in [`src/api/rotationApi.ts`](../src/api/rotationApi.ts).
-3. Implement it in [`httpRotationApi.ts`](../src/api/httpRotationApi.ts) (real call, validated in [`normalize.ts`](../src/api/normalize.ts)), in [`demoRotationApi.ts`](../src/api/demoRotationApi.ts) (bundled data) and in [`withDemoFallback.ts`](../src/api/withDemoFallback.ts).
+3. Implement it in [`httpRotationApi.ts`](../src/api/httpRotationApi.ts) and validate the answer in [`normalize.ts`](../src/api/normalize.ts).
 4. Call it from a hook in [`src/hooks`](../src/hooks) (see `useSites.ts` and `useComparison.ts`); screens never call `fetch`.
-
-TypeScript will point at every implementation that is missing the new method.

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { ComponentRef } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 
@@ -10,6 +10,8 @@ import { WIDE_BREAKPOINT, colors, fonts, isWeb } from '../../theme';
 import type { Answers } from '../../types/answers';
 import { ClimateCard } from './ClimateCard';
 import { ComparisonError, ComparisonLoader } from './ComparisonStatus';
+import { CurrentWeatherCard } from './CurrentWeatherCard';
+import { ExplanationCard } from './ExplanationCard';
 import { PriorityChangeBanner } from './PriorityChangeBanner';
 import { PrioritySwitch } from './PrioritySwitch';
 import { ScenarioCard } from './ScenarioCard';
@@ -44,14 +46,37 @@ export function ResultsScreen({ site, answers, onPriorityChange, onEdit, onResta
   const text = t.results;
   const { width } = useWindowDimensions();
   const wide = width >= WIDE_BREAKPOINT;
+  const [tab, setTab] = useState<'comparison' | 'weather'>('comparison');
+  const tabs = [{ id: 'comparison', label: text.title }, { id: 'weather', label: text.weatherTab }] as const;
   const priority = answers.priority ?? 'water';
   const { data, loading, failed, change, reload } = useComparison(answers, priority, language);
+  const [showOptions, setShowOptions] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
   const scrollRef = useRef<ComponentRef<typeof ScrollView>>(null);
 
   // Bring the explanation into view when the priority change produced one.
   useEffect(() => {
     if (change) scrollRef.current?.scrollTo({ y: 0, animated: true });
   }, [change]);
+
+  const tabBar = (
+    <View style={styles.tabs} accessibilityRole="tablist">
+      {tabs.map((item) => (
+        <Pressable
+          key={item.id}
+          accessibilityRole="tab"
+          accessibilityState={{ selected: item.id === tab }}
+          onPress={() => {
+            setTab(item.id);
+            scrollRef.current?.scrollTo({ y: 0, animated: false });
+          }}
+          style={[styles.tab, item.id === tab && styles.activeTab]}
+        >
+          <AppText variant="body" color={item.id === tab ? colors.ivory : colors.ink}>{item.label}</AppText>
+        </Pressable>
+      ))}
+    </View>
+  );
 
   if (!data) {
     return <View style={styles.root}>{failed ? <ComparisonError onRetry={reload} /> : <ComparisonLoader />}</View>;
@@ -68,18 +93,19 @@ export function ResultsScreen({ site, answers, onPriorityChange, onEdit, onResta
           <Pressable accessibilityRole="button" accessibilityLabel={t.backToStart} onPress={onRestart} hitSlop={8}>
             <Logo height={wide ? 40 : 34} />
           </Pressable>
+          {wide ? tabBar : null}
           <LanguageToggle />
         </View>
 
         <Enter style={{ marginTop: wide ? 28 : 18 }}>
           {data.isDemo ? <DemoBadge style={styles.demoBadge} /> : null}
           <AppText variant="title" accessibilityRole="header" style={wide ? styles.titleWide : undefined}>
-            {text.title}
+            {tab === 'comparison' ? text.title : text.weatherTab}
           </AppText>
           <View style={styles.answers}>
             <View style={styles.answersText}>
               <AppText variant="body" style={styles.answersMain}>
-                {site?.name ?? text.area} · {text.currentCrop(answers.crop ? t.crop[answers.crop].inline : '')}
+                {site?.department || site?.name || text.area} · {text.currentCrop(answers.crop ? t.crop[answers.crop].inline : '')}
               </AppText>
               <AppText variant="small">{text.soilSummary(t.texture[answers.texture].inline, t.drainage[answers.drainage].inline)}</AppText>
             </View>
@@ -87,36 +113,55 @@ export function ResultsScreen({ site, answers, onPriorityChange, onEdit, onResta
               <Text style={styles.editText}>{text.change}</Text>
             </Pressable>
           </View>
-          {soilIsIncomplete ? (
+          {tab === 'comparison' && soilIsIncomplete && showOptions ? (
             <View style={styles.note}>
               <AppText variant="small" color={colors.ink}>{text.missingSoil}</AppText>
             </View>
           ) : null}
         </Enter>
 
-        {wide ? (
-          <Enter delay={80} style={styles.switchWide}>
-            <AppText variant="label" color={colors.ink}>{text.priorityQuestion}</AppText>
-            <PrioritySwitch value={priority} onChange={onPriorityChange} busy={loading} />
-          </Enter>
-        ) : null}
-
-        <PriorityChangeBanner change={change} data={data} priority={priority} />
-
-        <View style={[wide ? styles.cardsWide : styles.cards, loading && styles.refreshing]}>
-          {scenarios.map((scenario, position) => {
-            const highlighted = scenario.id === highlightedId;
-            return (
-              <Enter key={`${scenario.id}-${highlighted ? 'on' : 'off'}-${priority}`} delay={60 + position * 90} offsetY={22} style={wide ? styles.cardColumn : undefined}>
-                <ScenarioCard scenario={scenario} sources={data.sources} priority={priority} highlighted={highlighted} />
+        {tab === 'comparison' ? (
+          <>
+            {wide ? (
+              <Enter delay={80} style={styles.switchWide}>
+                <AppText variant="label" color={colors.ink}>{text.priorityQuestion}</AppText>
+                <PrioritySwitch value={priority} onChange={onPriorityChange} busy={loading} />
               </Enter>
-            );
-          })}
-        </View>
+            ) : null}
 
-        <Enter delay={320} style={styles.climate}>
-          <ClimateCard climate={data.climate} sources={data.sources} />
-        </Enter>
+            <PriorityChangeBanner change={change} data={data} priority={priority} />
+
+            {data.explanation ? (
+              <Enter delay={40} style={[styles.explanation, loading && styles.refreshing]}>
+                <ExplanationCard explanation={data.explanation} />
+              </Enter>
+            ) : null}
+
+            <Pressable accessibilityRole="button" accessibilityState={{ expanded: showOptions }} onPress={() => setShowOptions(!showOptions)} style={styles.disclosure}>
+              <AppText variant="body">{showOptions ? text.hideDetails : text.otherOptions}</AppText>
+            </Pressable>
+            {showOptions ? <View style={[wide ? styles.cardsWide : styles.cards, loading && styles.refreshing]}>
+              {scenarios.map((scenario, position) => {
+                const highlighted = scenario.id === highlightedId;
+                return (
+                  <Enter key={`${scenario.id}-${highlighted ? 'on' : 'off'}-${priority}`} delay={60 + position * 90} offsetY={22} style={wide ? styles.cardColumn : undefined}>
+                    <ScenarioCard scenario={scenario} sources={data.sources} priority={priority} highlighted={highlighted} />
+                  </Enter>
+                );
+              })}
+            </View> : null}
+          </>
+        ) : (
+          <>
+            {site ? <CurrentWeatherCard key={site.id} site={site} /> : null}
+            <Pressable accessibilityRole="button" accessibilityState={{ expanded: showHistory }} onPress={() => setShowHistory(!showHistory)} style={styles.disclosure}>
+              <AppText variant="body">{showHistory ? text.hideDetails : text.weatherHistory}</AppText>
+            </Pressable>
+            {showHistory ? <Enter delay={60} style={styles.climate}>
+              <ClimateCard climate={data.climate} sources={data.sources} />
+            </Enter> : null}
+          </>
+        )}
 
         <View style={styles.footer}>
           {data.warnings.map((warning) => (
@@ -130,8 +175,8 @@ export function ResultsScreen({ site, answers, onPriorityChange, onEdit, onResta
       {/* On phones the switch stays at the bottom, within reach of the thumb. */}
       {!wide ? (
         <View style={[styles.dock, glass]}>
-          <AppText variant="label" color={colors.ink} style={styles.dockLabel}>{text.priorityQuestion}</AppText>
-          <PrioritySwitch value={priority} onChange={onPriorityChange} busy={loading} />
+          {tab === 'comparison' ? <PrioritySwitch value={priority} onChange={onPriorityChange} busy={loading} /> : null}
+          {tabBar}
         </View>
       ) : null}
     </View>
@@ -160,9 +205,13 @@ const styles = StyleSheet.create({
   cardColumn: { flex: 1 },
   refreshing: { opacity: 0.45 },
   climate: { marginTop: 16 },
+  disclosure: { marginTop: 16, minHeight: 48, justifyContent: 'center', padding: 12, borderWidth: 1, borderColor: colors.line, borderRadius: 16 },
+  explanation: { marginTop: 16 },
   footer: { marginTop: 20, gap: 4 },
   disclaimer: { marginTop: 6 },
   startOver: { marginTop: 14 },
   dock: { position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: 12, paddingTop: 10, paddingBottom: 14, gap: 8, backgroundColor: 'rgba(247,243,232,0.9)', borderTopWidth: 1, borderTopColor: colors.line },
-  dockLabel: { textAlign: 'center' },
+  tabs: { flexDirection: 'row', justifyContent: 'center', gap: 8 },
+  tab: { minHeight: 44, paddingHorizontal: 14, paddingVertical: 8, borderRadius: 22, justifyContent: 'center', borderWidth: 1, borderColor: colors.line },
+  activeTab: { backgroundColor: colors.ink, borderColor: colors.ink },
 });

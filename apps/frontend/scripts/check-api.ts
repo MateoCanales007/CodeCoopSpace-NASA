@@ -9,23 +9,23 @@
  * same validation the app uses (src/api/normalize.ts) and lists which optional
  * fields are still missing. Exit code 1 means a required check failed.
  */
-import { normalizeCompareResponse, normalizeSites } from '../src/api/normalize';
+import { normalizeCompareResponse, normalizeComplementaryClimate, normalizeSites } from '../src/api/normalize';
 import type { CompareRequest } from '../src/api/types';
 
 const baseUrl = (process.argv[2] ?? process.env.EXPO_PUBLIC_API_URL ?? 'http://127.0.0.1:8000').replace(/\/$/, '');
 const headers = { 'Content-Type': 'application/json', Accept: 'application/json', 'Accept-Language': 'en' };
 
 const SAMPLE_REQUEST: CompareRequest = {
-  siteId: 'san-miguel-demo',
+  siteId: 'san-miguel',
   currentCrop: 'maize',
   soil: { texture: 'unknown', drainage: 'unknown' },
   priorities: ['water', 'soil', 'diversification'],
 };
 
-/** Fields this frontend proposes on top of the agreed contract. The app works without them. */
-const OPTIONAL_RESPONSE_FIELDS = ['isDemo', 'highlight'];
-const OPTIONAL_SCENARIO_FIELDS = ['role', 'summary', 'limitation', 'missingData', 'sourceIds'];
-const OPTIONAL_CLIMATE_FIELDS = ['alert', 'note'];
+/** Fields the UI can live without: when one is missing, that piece is hidden. */
+const OPTIONAL_RESPONSE_FIELDS = ['isDemo', 'highlight', 'explanation'];
+const OPTIONAL_SCENARIO_FIELDS = ['role', 'summary', 'limitation', 'missingData', 'sourceIds', 'blocked'];
+const OPTIONAL_CLIMATE_FIELDS = ['alert', 'note', 'periodLabel', 'spatialScale'];
 
 let failures = 0;
 const pass = (message: string) => console.log(`  ok    ${message}`);
@@ -46,6 +46,28 @@ async function checkHealth() {
   const { status } = await call('/health');
   if (status === 200) pass('GET /health → 200');
   else fail(`GET /health → ${status} (expected 200)`);
+}
+
+/** Complementary weather. `unavailable` is a valid answer: the comparison must not depend on it. */
+async function checkComplementaryClimate() {
+  const path = '/v1/climate/meteomatics';
+  const { status, body } = await call(path);
+  if (status !== 200) {
+    fail(`GET ${path} → ${status} (expected 200, also when the provider fails)`);
+    return;
+  }
+  try {
+    const climate = normalizeComplementaryClimate(body, path);
+    pass(`GET ${path} → "${climate.status}", ${climate.coverage.validDays} of ${climate.coverage.expectedDays} day(s), ${climate.period.start} to ${climate.period.end}`);
+    if (climate.status === 'unavailable') warn(`Meteomatics is unavailable (${climate.reason}): the card explains why and shows no figures`);
+    if (climate.stale) warn('the server answered with a saved copy (stale)');
+  } catch (error) {
+    fail(error instanceof Error ? error.message : String(error));
+  }
+
+  const invalid = await call(`${path}?start=2024-05-07&end=2024-05-01`);
+  if (invalid.status === 422) pass('end before start → 422');
+  else fail(`end before start → ${invalid.status} (expected 422)`);
 }
 
 async function checkSites(): Promise<string | null> {
@@ -78,6 +100,11 @@ async function checkCompare(siteId: string) {
     pass(`POST ${path} → ${result.scenarios.length} scenario(s), climate "${result.climate.status}", ${result.sources.length} source(s)`);
     if (result.scenarios.filter((scenario) => scenario.role === 'alternative').length < 2) warn('the UI is designed for the current rotation plus two alternatives');
     if (!result.sources.some((source) => source.kind === 'nasa')) warn('no source with kind "nasa": the NASA chip and link will not show');
+    if (result.climate.kind === 'saved-sample') warn('the weather is the saved one-week sample (demo mode): NASA POWER did not answer');
+    if (result.climate.status === 'unavailable') warn('the weather is unavailable: water is left unrated');
+    if (!result.explanation) warn('no explanation: the "In short" card will not show');
+    else if (result.explanation.source === 'rules') warn(`the explanation was written by the rules, not by Groq (${result.explanation.fallbackReason ?? 'no reason given'})`);
+    else pass(`explanation worded by Groq (${result.explanation.model})`);
 
     const raw = body as { scenarios: unknown[]; climate: unknown };
     const absent = [
@@ -107,6 +134,7 @@ async function main() {
   console.log(`Checking ${baseUrl}`);
   try {
     await checkHealth();
+    await checkComplementaryClimate();
     const siteId = await checkSites();
     if (siteId) {
       await checkCompare(siteId);

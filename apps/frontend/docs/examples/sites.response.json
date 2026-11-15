@@ -1,6 +1,6 @@
 [
   {
-    "id": "san-miguel-demo",
+    "id": "san-miguel",
     "name": "San Miguel",
     "department": "San Miguel",
     "approxLat": 13.64,
@@ -10,6 +10,175 @@
       "bean",
       "sorghum"
     ],
-    "isDemo": true
+    "isDemo": false
+  },
+  {
+    "id": "ahuachapan",
+    "name": "Ahuachapán",
+    "department": "Ahuachapán",
+    "approxLat": 13.92,
+    "approxLon": -89.85,
+    "crops": [
+      "maize",
+      "bean",
+      "sorghum"
+    ],
+    "isDemo": false
+  },
+  {
+    "id": "santa-ana",
+    "name": "Santa Ana",
+    "department": "Santa Ana",
+    "approxLat": 13.99,
+    "approxLon": -89.56,
+    "crops": [
+      "maize",
+      "bean",
+      "sorghum"
+    ],
+    "isDemo": false
+  },
+  {
+    "id": "sonsonate",
+    "name": "Sonsonate",
+    "department": "Sonsonate",
+    "approxLat": 13.72,
+    "approxLon": -89.72,
+    "crops": [
+      "maize",
+      "bean",
+      "sorghum"
+    ],
+    "isDemo": false
+  },
+  {
+    "id": "chalatenango",
+    "name": "Chalatenango",
+    "department": "Chalatenango",
+    "approxLat": 14.04,
+    "approxLon": -88.94,
+    "crops": [
+      "maize",
+      "bean",
+      "sorghum"
+    ],
+    "isDemo": false
+  },
+  {
+    "id": "santa-tecla",
+    "name": "Santa Tecla",
+    "department": "La Libertad",
+    "approxLat": 13.68,
+    "approxLon": -89.29,
+    "crops": [
+      "maize",
+      "bean",
+      "sorghum"
+    ],
+    "isDemo": false
+  },
+  {
+    "id": "san-salvador",
+    "name": "San Salvador",
+    "department": "San Salvador",
+    "approxLat": 13.69,
+    "approxLon": -89.19,
+    "crops": [
+      "maize",
+      "bean",
+      "sorghum"
+    ],
+    "isDemo": false
+  },
+  {
+    "id": "cojutepeque",
+    "name": "Cojutepeque",
+    "department": "Cuscatlán",
+    "approxLat": 13.72,
+    "approxLon": -88.93,
+    "crops": [
+      "maize",
+      "bean",
+      "sorghum"
+    ],
+    "isDemo": false
+  },
+  {
+    "id": "zacatecoluca",
+    "name": "Zacatecoluca",
+    "department": "La Paz",
+    "approxLat": 13.51,
+    "approxLon": -88.87,
+    "crops": [
+      "maize",
+      "bean",
+      "sorghum"
+    ],
+    "isDemo": false
+  },
+  {
+    "id": "sensuntepeque",
+    "name": "Sensuntepeque",
+    "department": "Cabañas",
+    "approxLat": 13.88,
+    "approxLon": -88.63,
+    "crops": [
+      "maize",
+      "bean",
+      "sorghum"
+    ],
+    "isDemo": false
+  },
+  {
+    "id": "san-vicente",
+    "name": "San Vicente",
+    "department": "San Vicente",
+    "approxLat": 13.64,
+    "approxLon": -88.78,
+    "crops": [
+      "maize",
+      "bean",
+      "sorghum"
+    ],
+    "isDemo": false
+  },
+  {
+    "id": "usulutan",
+    "name": "Usulután",
+    "department": "Usulután",
+    "approxLat": 13.35,
+    "approxLon": -88.44,
+    "crops": [
+      "maize",
+      "bean",
+      "sorghum"
+    ],
+    "isDemo": false
+  },
+  {
+    "id": "san-francisco-gotera",
+    "name": "San Francisco Gotera",
+    "department": "Morazán",
+    "approxLat": 13.7,
+    "approxLon": -88.1,
+    "crops": [
+      "maize",
+      "bean",
+      "sorghum"
+    ],
+    "isDemo": false
+  },
+  {
+    "id": "la-union",
+    "name": "La Unión",
+    "department": "La Unión",
+    "approxLat": 13.34,
+    "approxLon": -87.84,
+    "crops": [
+      "maize",
+      "bean",
+      "sorghum"
+    ],
+    "isDemo": false
   }
 ]

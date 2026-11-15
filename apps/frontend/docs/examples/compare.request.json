@@ -1,13 +1,13 @@
 {
-  "siteId": "san-miguel-demo",
-  "currentCrop": "maize",
+  "siteId": "san-miguel",
+  "currentCrop": "sorghum",
   "soil": {
     "texture": "unknown",
-    "drainage": "unknown"
+    "drainage": "good"
   },
   "priorities": [
+    "diversification",
     "water",
-    "soil",
-    "diversification"
+    "soil"
   ]
 }

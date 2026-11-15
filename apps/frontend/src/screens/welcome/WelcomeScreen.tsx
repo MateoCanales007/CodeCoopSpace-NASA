@@ -21,7 +21,7 @@ export function WelcomeScreen({ onStart }: { onStart: () => void }) {
   const { width, height } = useWindowDimensions();
   const wide = width >= WIDE_BREAKPOINT;
   const pointer = usePointer(!reduced);
-  const { index, next, previous, goTo } = useSceneCarousel(SCENES.length, !reduced);
+  const { index, next, previous, goTo } = useSceneCarousel(SCENES.length, false);
 
   // On touch screens a horizontal swipe changes the scene and moves the depth layers.
   const panResponder = useMemo(
@@ -67,9 +67,7 @@ export function WelcomeScreen({ onStart }: { onStart: () => void }) {
 
       <View style={[wide ? styles.copyWide : styles.copy, { paddingHorizontal: padding }, scrim]}>
         <View style={wide ? styles.copyColumn : null}>
-          <Enter delay={380} style={styles.control}>
-            <SceneControl index={index} onNext={next} onPrevious={previous} onSelect={goTo} />
-          </Enter>
+
 
           <Enter delay={120} offsetY={26}>
             <AppText variant="display" accessibilityRole="header" style={{ fontSize: titleSize, lineHeight: titleSize * (wide ? 1 : 1.04), letterSpacing: wide ? -2.5 : -1 }}>
@@ -87,6 +85,11 @@ export function WelcomeScreen({ onStart }: { onStart: () => void }) {
               {t.welcome.note}
             </AppText>
           </Enter>
+          {wide ? (
+            <Enter delay={380} style={styles.control}>
+              <SceneControl index={index} onNext={next} onPrevious={previous} onSelect={goTo} />
+            </Enter>
+          ) : null}
         </View>
       </View>
     </View>
@@ -98,7 +101,7 @@ const styles = StyleSheet.create({
   copy: { position: 'absolute', left: 0, right: 0, bottom: 0, paddingBottom: 22, paddingTop: 64 },
   copyWide: { position: 'absolute', left: 0, top: 0, bottom: 0, width: '56%', justifyContent: 'center', paddingTop: 60 },
   copyColumn: { maxWidth: 560 },
-  control: { marginBottom: 16 },
+  control: { marginTop: 16 },
   lead: { marginTop: 10, maxWidth: 470, fontSize: 18, lineHeight: 25 },
   leadWide: { marginTop: 20, maxWidth: 470, fontSize: 21, lineHeight: 31 },
   ctaWide: { alignSelf: 'flex-start', minWidth: 320 },

@@ -4,7 +4,7 @@ import { Animated, Easing, Pressable, ScrollView, StyleSheet, View, useWindowDim
 
 import type { Site } from '../../api/types';
 import { SCENES } from '../../components/scene';
-import { AppText, Button, DemoBadge, Enter, LanguageToggle, Logo, RoundButton } from '../../components/ui';
+import { AppText, Button, Enter, LanguageToggle, Logo, RoundButton } from '../../components/ui';
 import { useReducedMotion } from '../../context/ReducedMotionContext';
 import { useTranslation } from '../../i18n';
 import { WIDE_BREAKPOINT, colors } from '../../theme';
@@ -14,6 +14,10 @@ import { WIZARD_STEPS } from './steps';
 
 interface WizardScreenProps {
   sites: Site[];
+  /** The areas come from the server; these describe that request. */
+  sitesLoading: boolean;
+  sitesFailed: boolean;
+  onRetrySites: () => void;
   answers: Answers;
   onChange: (patch: Partial<Answers>) => void;
   step: number;
@@ -23,7 +27,7 @@ interface WizardScreenProps {
 }
 
 /** One question per screen, with the actions at the bottom, within reach of the thumb. */
-export function WizardScreen({ sites, answers, onChange, step, onStepChange, onExit, onDone }: WizardScreenProps) {
+export function WizardScreen({ sites, sitesLoading, sitesFailed, onRetrySites, answers, onChange, step, onStepChange, onExit, onDone }: WizardScreenProps) {
   const reduced = useReducedMotion();
   const { t } = useTranslation();
   const { width, height } = useWindowDimensions();
@@ -79,7 +83,6 @@ export function WizardScreen({ sites, answers, onChange, step, onStepChange, onE
         <View style={styles.progress}>
           <View style={styles.progressHeader}>
             <AppText variant="label" color={colors.ink}>{t.wizard.stepOf(step + 1, total)}</AppText>
-            <DemoBadge />
           </View>
           <View style={styles.track} accessibilityRole="progressbar" accessibilityValue={{ min: 0, max: total, now: step + 1 }}>
             <Animated.View style={[styles.trackFill, { width: progress.interpolate({ inputRange: [0, total - 1], outputRange: [`${100 / total}%`, '100%'] }) }]} />
@@ -92,7 +95,14 @@ export function WizardScreen({ sites, answers, onChange, step, onStepChange, onE
             <AppText variant="lead" style={styles.help}>{copy.help}</AppText>
           </Enter>
           <Enter key={`body-${step}`} offsetX={44 * direction.current} offsetY={0} delay={70} duration={460} style={styles.body}>
-            <StepBody sites={sites} answers={answers} onChange={onChange} />
+            {sites.length === 0 ? (
+              <View style={styles.sitesStatus}>
+                <AppText variant="body">{sitesFailed ? t.wizard.sitesError : sitesLoading ? t.wizard.sitesLoading : t.wizard.sitesEmpty}</AppText>
+                {sitesFailed ? <Button label={t.results.retry} variant="ghost" onPress={onRetrySites} /> : null}
+              </View>
+            ) : (
+              <StepBody sites={sites} answers={answers} onChange={onChange} />
+            )}
           </Enter>
         </ScrollView>
 
@@ -126,6 +136,7 @@ const styles = StyleSheet.create({
   titleWide: { fontSize: 44, lineHeight: 48, letterSpacing: -1 },
   help: { marginTop: 6, fontSize: 17, lineHeight: 24 },
   body: { marginTop: 20 },
+  sitesStatus: { gap: 14, borderLeftWidth: 3, borderLeftColor: colors.maize, paddingLeft: 12, paddingVertical: 4 },
   footer: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingTop: 12, paddingBottom: 18, borderTopWidth: 1, borderTopColor: colors.line },
   nextButton: { flex: 1 },
 });

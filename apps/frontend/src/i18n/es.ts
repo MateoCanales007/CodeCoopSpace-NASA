@@ -6,7 +6,7 @@ const parseDate = (iso: string) => iso.split('-').map(Number);
 /** Spanish translation, written in plain Salvadoran Spanish and the formal "usted". */
 export const es: Translations = {
   documentTitle: 'Yago · ¿Qué sembrar después?',
-  demoData: 'Datos de demostración',
+  demoData: 'Modo demo',
   backToStart: 'Volver al inicio',
   language: 'Idioma',
 
@@ -18,11 +18,11 @@ export const es: Translations = {
   priority: {
     water: { name: 'Cuidar el agua', short: 'Agua', hint: 'Que aguante si la lluvia falla', goal: 'cuidar el agua' },
     soil: { name: 'Proteger el suelo', short: 'Suelo', hint: 'Que la tierra no se canse', goal: 'proteger el suelo' },
-    diversification: { name: 'Diversificar', short: 'Variar', hint: 'No depender de un solo cultivo', goal: 'diversificar' },
+    diversification: { name: 'Cambiar de cultivo', short: 'Variar', hint: 'No depender de un solo cultivo', goal: 'diversificar' },
   },
   texture: {
     sandy: { name: 'Arenosa', hint: 'Suelta, el agua se va rápido', inline: 'arenosa' },
-    loam: { name: 'Franca', hint: 'Ni muy suelta ni muy pegajosa', inline: 'franca' },
+    loam: { name: 'Ni suelta ni pegajosa', hint: 'Ni muy suelta ni muy pegajosa', inline: 'franca' },
     clay: { name: 'Arcillosa', hint: 'Pegajosa, se hace barro', inline: 'arcillosa' },
     unknown: { name: 'No sé', hint: 'Está bien, seguimos sin ese dato', inline: 'no sé' },
   },
@@ -40,8 +40,9 @@ export const es: Translations = {
   sourceKind: {
     nasa: 'Dato NASA',
     'local-reference': 'Referencia local',
+    'technical-reference': 'Referencia técnica',
     'user-input': 'Su respuesta',
-    'demo-assumption': 'Supuesto de demo',
+    'demo-assumption': 'Supuesto del método',
   },
 
   /** "2024-05-01" + "2024-05-07" → "1 al 7 de mayo de 2024" */
@@ -52,10 +53,16 @@ export const es: Translations = {
     return `${startDay} de ${MONTHS[startMonth - 1]} de ${startYear} al ${endDay} de ${MONTHS[endMonth - 1]} de ${endYear}`;
   },
 
+  /** "2026-11-14" → "14 de noviembre de 2026" */
+  formatDay: (iso) => {
+    const [year, month, day] = parseDate(iso);
+    return `${day} de ${MONTHS[month - 1]} de ${year}`;
+  },
+
   welcome: {
     title: '¿Qué sembrar después?',
-    lead: 'Compare lo que siembra hoy con dos alternativas, según el agua, el suelo y lo que a usted le importa.',
-    cta: 'Comparar cultivos',
+    lead: 'Díganos dónde siembra y qué tiene sembrado. Le ayudamos a ver qué podría sembrar después.',
+    cta: 'Empezar',
     note: 'Abre directo. Sin cuentas ni contraseñas.',
     previousScene: 'Escena anterior',
     nextScene: 'Escena siguiente',
@@ -72,24 +79,38 @@ export const es: Translations = {
 
   wizard: {
     steps: [
-      { title: '¿Dónde siembra?', help: 'Elija la zona más cercana a su terreno.' },
+      { title: '¿Dónde siembra?', help: 'Busque el departamento donde queda su terreno.' },
       { title: '¿Qué tiene sembrado ahora?', help: 'El cultivo de este ciclo.' },
       { title: '¿Cómo es su tierra?', help: 'Si no está seguro, deje “No sé”.' },
       { title: '¿Qué le importa más?', help: 'Después lo puede cambiar para ver qué pasa.' },
     ],
     stepOf: (step, total) => `Paso ${step} de ${total}`,
-    demoSiteHint: 'Zona de ejemplo · oriente del país',
-    singleSiteNote: 'Por ahora solo hay una zona de ejemplo. Más zonas llegarán cuando el equipo conecte los datos.',
+    climateReference: (city) => 'Cabecera de referencia: ' + city,
+    siteScaleNote: 'Usamos la cabecera del departamento como referencia para el clima.',
+    sitesLoading: 'Cargando las zonas…',
+    sitesEmpty: 'El servidor no devolvió ninguna zona.',
+    sitesError: 'No se pudo llegar al servidor para cargar las zonas. Revise su conexión e intente otra vez.',
     textureQuestion: 'Al agarrarla con la mano es…',
     drainageQuestion: 'Cuando llueve fuerte, el agua…',
     previousStep: 'Paso anterior',
     chooseOption: 'Elija una opción',
     next: 'Seguir',
-    seeComparison: 'Ver comparación',
+    seeComparison: 'Ver qué puedo sembrar',
   },
 
   results: {
     title: 'Su comparación',
+    weatherTab: 'El clima',
+    otherOptions: 'Ver las otras opciones y sus fuentes',
+    weatherNow: 'Temperatura ahora',
+    forecastTitle: 'Pronóstico para las próximas 24 horas',
+    weatherLoading: 'Buscando el clima de su zona…',
+    weatherUnavailable: 'Por ahora no tenemos el clima de su zona.',
+    refreshWeather: 'Actualizar clima',
+    forecastRain: 'Lluvia prevista en las 6 horas hasta esa hora',
+    weatherSource: 'Datos de Meteomatics. Hora de El Salvador.',
+    weatherPartial: 'Faltan algunos datos del clima.',
+    weatherHistory: 'Ver cómo ha sido la lluvia en otros años',
     area: 'Zona',
     currentCrop: (crop) => `hoy tiene ${crop}`,
     soilSummary: (texture, drainage) => `Tierra: ${texture} · Agua: ${drainage}`,
@@ -109,6 +130,9 @@ export const es: Translations = {
     openSource: 'Abrir la fuente ↗',
     openSourceLabel: (name) => `Abrir fuente: ${name}`,
     climateTitle: 'Clima histórico de la zona',
+    climateSampleTitle: 'Muestra guardada de clima',
+    outOf: (value, total) => `${value} de ${total}`,
+    yearsCoverage: (valid, expected) => `${valid} de ${expected} años con datos completos.`,
     noData: 'Sin dato',
     rainIn: (days) => `de lluvia en ${days} días`,
     dryDaysOf: (dry, days) => `${dry} de ${days}`,
@@ -119,9 +143,39 @@ export const es: Translations = {
     coverage: (valid, expected) => `${valid} de ${expected} días con dato.`,
     openNasaQuery: 'Abrir la consulta a NASA ↗',
     openNasaQueryLabel: 'Abrir la consulta a NASA POWER',
+    complementaryChip: 'Meteomatics',
+    complementaryTitle: 'Clima reciente, segunda fuente',
+    complementaryLoading: 'Consultando Meteomatics…',
+    minTempCaption: 'mínima promedio',
+    retrieved: (date) => `Consultado el ${date}.`,
+    complementaryNote:
+      'Clima modelado de los últimos días por otro proveedor, puesto como contexto. No cambia la comparación, que usa la historia de NASA de arriba. Sus días van en hora UTC.',
+    complementaryStale: 'El proveedor no respondió ahora. Esta es una copia guardada.',
+    complementaryIndependent: 'La comparación no depende de esto: usa la historia de NASA de arriba.',
+    complementaryReason: {
+      not_configured: 'Meteomatics todavía no está configurado en el servidor.',
+      auth_failed: 'Meteomatics rechazó el acceso del servidor, o la prueba terminó.',
+      timeout: 'Meteomatics tardó demasiado en responder.',
+      upstream_error: 'Meteomatics devolvió un error.',
+      invalid_response: 'Meteomatics respondió en un formato que no pudimos leer.',
+      unreachable: 'No se pudo llegar al servidor para consultar Meteomatics.',
+    },
+    explanationTitle: 'En resumen',
+    explanationAiChip: 'Redactado con IA',
+    explanationRulesChip: 'Resumen automático',
+    explanationLabels: { consider: 'Qué considerar', influence: 'Lo que más pesó', caution: 'Ojo', verify: 'Antes de sembrar' },
+    explanationByAi: (model) => `Redactado por un modelo de IA (Groq · ${model}) a partir del resultado que calcularon las reglas. Los cultivos, las cifras, las valoraciones y las fuentes no salen de la IA.`,
+    explanationByRules: 'Resumen corto escrito por las reglas, sin IA.',
+    explanationFallback: {
+      not_configured: 'La redacción con IA no está configurada en el servidor.',
+      timeout: 'La IA tardó demasiado en responder.',
+      rate_limited: 'La IA llegó a su límite de uso por ahora.',
+      provider_error: 'El servicio de IA falló.',
+      invalid_output: 'La respuesta de la IA no pasó las revisiones y se descartó.',
+    },
     comparing: 'Comparando cultivos…',
     errorTitle: 'No se pudo comparar',
-    errorText: 'Revise su conexión e intente otra vez.',
+    errorText: 'No se pudo llegar al servidor. Revise su conexión e intente otra vez.',
     retry: 'Intentar otra vez',
     disclaimer: (method) => `Yago sirve para explorar y conversar con un técnico de su zona. No predice cosechas ni reemplaza una visita al terreno. Método: ${method}.`,
     startOver: 'Empezar de nuevo',

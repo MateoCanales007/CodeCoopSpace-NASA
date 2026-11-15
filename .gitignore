@@ -10,3 +10,6 @@ __pycache__/
 .env.*
 !.env.example
 *.log
+
+# Copias guardadas de NASA POWER (se regeneran solas)
+.cache/
