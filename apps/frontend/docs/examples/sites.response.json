@@ -1,0 +1,15 @@
+[
+  {
+    "id": "san-miguel-demo",
+    "name": "San Miguel",
+    "department": "San Miguel",
+    "approxLat": 13.64,
+    "approxLon": -88.45,
+    "crops": [
+      "maize",
+      "bean",
+      "sorghum"
+    ],
+    "isDemo": true
+  }
+]

@@ -1,0 +1,23 @@
+{
+  "expo": {
+    "name": "Yago",
+    "slug": "codecoopspace-nasa",
+    "version": "0.1.0",
+    "web": {
+      "bundler": "metro",
+      "favicon": "./assets/brand/favicon.png",
+      "name": "Yago",
+      "shortName": "Yago",
+      "lang": "en",
+      "themeColor": "#F7F3E8",
+      "backgroundColor": "#F7F3E8",
+      "description": "Yago: compare what to plant next, based on water, soil and what matters most to you."
+    },
+    "plugins": [
+      "expo-font",
+      "expo-asset"
+    ],
+    "icon": "./assets/brand/icon.png",
+    "backgroundColor": "#F7F3E8"
+  }
+}

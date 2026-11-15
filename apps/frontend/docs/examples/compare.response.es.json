@@ -1,0 +1,260 @@
+{
+  "isDemo": true,
+  "climate": {
+    "status": "partial",
+    "period": {
+      "start": "2024-05-01",
+      "end": "2024-05-07"
+    },
+    "coverage": {
+      "validDays": 7,
+      "expectedDays": 7
+    },
+    "metrics": [
+      {
+        "id": "precipTotal",
+        "value": 18.2,
+        "unit": "mm",
+        "reason": "Suma de la lluvia diaria de los días con dato.",
+        "sourceId": "nasa-power"
+      },
+      {
+        "id": "dryDays",
+        "value": 3,
+        "unit": "días",
+        "reason": "Días con menos de 1 mm de lluvia (umbral de demostración).",
+        "sourceId": "nasa-power"
+      },
+      {
+        "id": "tMaxMean",
+        "value": 33.1,
+        "unit": "°C",
+        "reason": "Promedio de la temperatura máxima diaria.",
+        "sourceId": "nasa-power"
+      }
+    ],
+    "sourceId": "nasa-power",
+    "spatialScale": null,
+    "cacheAgeHours": null,
+    "alert": {
+      "priority": "water",
+      "text": "En esta muestra casi no llovió 3 de 7 días. Por eso, al comparar, pesa más cuánta agua pide cada cultivo."
+    },
+    "note": "Es clima histórico de una sola semana, no un pronóstico ni un resumen de la temporada. El dato describe una zona amplia, no su parcela."
+  },
+  "scenarios": [
+    {
+      "id": "maize-maize",
+      "role": "current",
+      "sequence": [
+        "maize",
+        "maize"
+      ],
+      "summary": "Es lo que usted ya conoce: no cambia su forma de trabajar ni lo que compra.",
+      "limitation": "Repetir maíz cansa el suelo y no reparte el riesgo.",
+      "missingData": "Falta saber cómo es su tierra: si es arenosa guarda menos agua y el maíz lo resiente más.",
+      "criteria": [
+        {
+          "priority": "water",
+          "status": "evaluable",
+          "level": "unfavorable",
+          "value": null,
+          "unit": null,
+          "reason": "El maíz pide bastante agua, sobre todo cuando florece. En la muestra de NASA casi no llovió 3 de 7 días.",
+          "evidence": [
+            "nasa-power",
+            "demo-rules",
+            "user-answers"
+          ]
+        },
+        {
+          "priority": "soil",
+          "status": "evaluable",
+          "level": "unfavorable",
+          "value": null,
+          "unit": null,
+          "reason": "Sembrar maíz otra vez saca del suelo lo mismo y deja que sigan las mismas plagas.",
+          "evidence": [
+            "demo-rules",
+            "centa-basic-grains",
+            "user-answers"
+          ]
+        },
+        {
+          "priority": "diversification",
+          "status": "evaluable",
+          "level": "unfavorable",
+          "value": null,
+          "unit": null,
+          "reason": "Es el mismo cultivo: si le va mal, no hay otro que responda.",
+          "evidence": [
+            "demo-rules"
+          ]
+        }
+      ],
+      "sourceIds": [
+        "nasa-power",
+        "demo-rules",
+        "user-answers",
+        "centa-basic-grains"
+      ]
+    },
+    {
+      "id": "maize-bean",
+      "role": "alternative",
+      "sequence": [
+        "maize",
+        "bean"
+      ],
+      "summary": "El frijol es de otra familia: ayuda al suelo y corta el ciclo de las plagas del cultivo anterior.",
+      "limitation": "Necesita lluvia pareja y no aguanta el suelo encharcado.",
+      "missingData": "Falta saber si su tierra se encharca. Con ese dato, esta opción puede subir o bajar.",
+      "criteria": [
+        {
+          "priority": "water",
+          "status": "evaluable",
+          "level": "neutral",
+          "value": null,
+          "unit": null,
+          "reason": "El frijol pide menos agua que el maíz, pero necesita lluvia pareja. En la muestra de NASA casi no llovió 3 de 7 días.",
+          "evidence": [
+            "nasa-power",
+            "demo-rules",
+            "user-answers"
+          ]
+        },
+        {
+          "priority": "soil",
+          "status": "evaluable",
+          "level": "favorable",
+          "value": null,
+          "unit": null,
+          "reason": "El frijol es leguminosa: ayuda a devolverle nitrógeno al suelo.",
+          "evidence": [
+            "demo-rules",
+            "centa-basic-grains",
+            "user-answers"
+          ]
+        },
+        {
+          "priority": "diversification",
+          "status": "evaluable",
+          "level": "favorable",
+          "value": null,
+          "unit": null,
+          "reason": "Pasa de gramínea a leguminosa: dos cultivos de familias distintas reparten el riesgo.",
+          "evidence": [
+            "demo-rules"
+          ]
+        }
+      ],
+      "sourceIds": [
+        "nasa-power",
+        "demo-rules",
+        "user-answers",
+        "centa-basic-grains"
+      ]
+    },
+    {
+      "id": "maize-sorghum",
+      "role": "alternative",
+      "sequence": [
+        "maize",
+        "sorghum"
+      ],
+      "summary": "El maicillo aguanta mejor cuando la lluvia falla y deja rastrojo que cubre el suelo.",
+      "limitation": "Es pariente del maíz: el suelo descansa menos que con frijol.",
+      "missingData": null,
+      "criteria": [
+        {
+          "priority": "water",
+          "status": "evaluable",
+          "level": "favorable",
+          "value": null,
+          "unit": null,
+          "reason": "El maicillo aguanta mejor los días sin lluvia. En la muestra de NASA casi no llovió 3 de 7 días.",
+          "evidence": [
+            "nasa-power",
+            "demo-rules",
+            "user-answers"
+          ]
+        },
+        {
+          "priority": "soil",
+          "status": "evaluable",
+          "level": "neutral",
+          "value": null,
+          "unit": null,
+          "reason": "Cambia de cultivo, pero el maicillo y el maíz son parientes: el suelo descansa menos.",
+          "evidence": [
+            "demo-rules",
+            "centa-basic-grains",
+            "user-answers"
+          ]
+        },
+        {
+          "priority": "diversification",
+          "status": "evaluable",
+          "level": "neutral",
+          "value": null,
+          "unit": null,
+          "reason": "Es otro cultivo, pero de la misma familia.",
+          "evidence": [
+            "demo-rules"
+          ]
+        }
+      ],
+      "sourceIds": [
+        "nasa-power",
+        "demo-rules",
+        "user-answers",
+        "centa-basic-grains"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "nasa-power",
+      "name": "NASA POWER Daily (MERRA-2)",
+      "note": "Lluvia (PRECTOTCORR, mm/día) y temperatura máxima (T2M_MAX, °C) del 1 al 7 de mayo de 2024 en un punto aproximado de San Miguel. Es una muestra de una semana para probar la conexión.",
+      "url": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M_MAX,T2M_MIN,PRECTOTCORR&community=AG&longitude=-88.45&latitude=13.64&start=20240501&end=20240507&format=JSON",
+      "version": "v2.10.3",
+      "kind": "nasa"
+    },
+    {
+      "id": "centa-basic-grains",
+      "name": "CENTA · Programa de Granos Básicos",
+      "note": "Referencia local para maíz, frijol y maicillo. Todavía no se ha tomado ningún valor de sus guías: falta verificar página, variedad y zona.",
+      "url": "https://www.centa.gob.sv/servicios/programa-granos-basicos/",
+      "version": null,
+      "kind": "local-reference"
+    },
+    {
+      "id": "demo-rules",
+      "name": "Reglas ilustrativas de Yago",
+      "note": "Comparaciones generales entre cultivos (familia, necesidad de agua, encharcamiento) usadas solo para mostrar cómo funcionará la app.",
+      "url": null,
+      "version": "demo-0.1 (reglas ilustrativas)",
+      "kind": "demo-assumption"
+    },
+    {
+      "id": "user-answers",
+      "name": "Lo que usted respondió",
+      "note": "Zona, cultivo actual, suelo y prioridad que eligió en los pasos anteriores.",
+      "url": null,
+      "version": null,
+      "kind": "user-input"
+    }
+  ],
+  "warnings": [
+    "Datos de demostración: caso ficticio de San Miguel con reglas ilustrativas.",
+    "El clima es una muestra de una semana (1–7 de mayo de 2024), no una referencia de temporada.",
+    "Falta información de su suelo. La comparación puede cambiar cuando la tenga."
+  ],
+  "methodVersion": "demo-0.1 (reglas ilustrativas)",
+  "highlight": {
+    "scenarioId": "maize-sorghum",
+    "priority": "water",
+    "reason": "de las dos alternativas, es la que mejor aguanta la falta de lluvia"
+  }
+}
