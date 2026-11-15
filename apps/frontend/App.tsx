@@ -1,30 +1,49 @@
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { BricolageGrotesque_700Bold } from '@expo-google-fonts/bricolage-grotesque/700Bold';
+import { BricolageGrotesque_800ExtraBold } from '@expo-google-fonts/bricolage-grotesque/800ExtraBold';
+import { Figtree_500Medium } from '@expo-google-fonts/figtree/500Medium';
+import { Figtree_600SemiBold } from '@expo-google-fonts/figtree/600SemiBold';
+import { Figtree_700Bold } from '@expo-google-fonts/figtree/700Bold';
+import { useFonts } from 'expo-font';
+import { useEffect } from 'react';
+import { Platform, StatusBar, StyleSheet, View } from 'react-native';
 
+import { Grain } from './src/components/ui';
+import { ReducedMotionProvider } from './src/context/ReducedMotionContext';
+import { LanguageProvider } from './src/i18n';
+import { RootNavigator } from './src/navigation/RootNavigator';
+import { colors, isWeb } from './src/theme';
+
+/** App shell: fonts, global providers and the sand grain over everything. */
 export default function App() {
+  // Each weight is imported from its own subpath so only these five are bundled.
+  const [fontsLoaded, fontError] = useFonts({
+    BricolageGrotesque_700Bold,
+    BricolageGrotesque_800ExtraBold,
+    Figtree_500Medium,
+    Figtree_600SemiBold,
+    Figtree_700Bold,
+  });
+
+  useEffect(() => {
+    if (isWeb && typeof document !== 'undefined') document.body.style.backgroundColor = colors.ivory;
+  }, []);
+
+  // If the fonts fail to load, render with system fonts rather than a blank screen.
+  if (!fontsLoaded && !fontError) return <View style={styles.root} />;
+
   return (
-    <ScrollView contentContainerStyle={styles.page}>
-      <View style={styles.content}>
-        <Text style={styles.team}>CodeCoop Space</Text>
-        <Text accessibilityRole="header" style={styles.title}>
-          Field Shift
-        </Text>
-        <Text style={styles.description}>
-          Explora cómo distintas rotaciones de cultivos podrían responder a las
-          condiciones de tu terreno y a tus prioridades.
-        </Text>
-        <Text style={styles.note}>
-          Base del equipo para NASA Space Apps 2026
-        </Text>
-      </View>
-    </ScrollView>
+    <LanguageProvider>
+      <ReducedMotionProvider>
+        <View style={styles.root}>
+          <StatusBar barStyle="dark-content" />
+          <RootNavigator />
+          <Grain opacity={0.1} />
+        </View>
+      </ReducedMotionProvider>
+    </LanguageProvider>
   );
 }
 
 const styles = StyleSheet.create({
-  page: { flexGrow: 1, justifyContent: 'center', backgroundColor: '#F2F6ED', padding: 28 },
-  content: { width: '100%', maxWidth: 680, alignSelf: 'center', gap: 16 },
-  team: { color: '#356245', fontWeight: '700', fontSize: 15 },
-  title: { color: '#172D20', fontWeight: '800', fontSize: 48 },
-  description: { color: '#263E30', fontSize: 20, lineHeight: 29 },
-  note: { color: '#496052', fontSize: 14 },
+  root: { flex: 1, backgroundColor: colors.ivory, paddingTop: Platform.OS === 'web' ? 0 : (StatusBar.currentHeight ?? 44) },
 });

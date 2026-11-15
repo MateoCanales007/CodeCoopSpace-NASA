@@ -1,0 +1,13 @@
+{
+  "siteId": "san-miguel-demo",
+  "currentCrop": "maize",
+  "soil": {
+    "texture": "unknown",
+    "drainage": "unknown"
+  },
+  "priorities": [
+    "water",
+    "soil",
+    "diversification"
+  ]
+}

@@ -1,0 +1,260 @@
+{
+  "isDemo": true,
+  "climate": {
+    "status": "partial",
+    "period": {
+      "start": "2024-05-01",
+      "end": "2024-05-07"
+    },
+    "coverage": {
+      "validDays": 7,
+      "expectedDays": 7
+    },
+    "metrics": [
+      {
+        "id": "precipTotal",
+        "value": 18.2,
+        "unit": "mm",
+        "reason": "Sum of daily rainfall over the days with data.",
+        "sourceId": "nasa-power"
+      },
+      {
+        "id": "dryDays",
+        "value": 3,
+        "unit": "days",
+        "reason": "Days with less than 1 mm of rain (demo threshold).",
+        "sourceId": "nasa-power"
+      },
+      {
+        "id": "tMaxMean",
+        "value": 33.1,
+        "unit": "°C",
+        "reason": "Average of the daily maximum temperature.",
+        "sourceId": "nasa-power"
+      }
+    ],
+    "sourceId": "nasa-power",
+    "spatialScale": null,
+    "cacheAgeHours": null,
+    "alert": {
+      "priority": "water",
+      "text": "In this sample there was almost no rain on 3 of 7 days. That is why, when comparing, how much water each crop needs counts more."
+    },
+    "note": "This is past weather for a single week, not a forecast or a season summary. It describes a wide area, not your plot."
+  },
+  "scenarios": [
+    {
+      "id": "maize-maize",
+      "role": "current",
+      "sequence": [
+        "maize",
+        "maize"
+      ],
+      "summary": "It is what you already know: no change in how you work or in what you buy.",
+      "limitation": "Repeating maize wears out the soil and does not spread the risk.",
+      "missingData": "We do not know what your soil is like: sandy soil holds less water and maize suffers more.",
+      "criteria": [
+        {
+          "priority": "water",
+          "status": "evaluable",
+          "level": "unfavorable",
+          "value": null,
+          "unit": null,
+          "reason": "Maize will need a lot of water, especially at flowering. In the NASA sample there was almost no rain on 3 of 7 days.",
+          "evidence": [
+            "nasa-power",
+            "demo-rules",
+            "user-answers"
+          ]
+        },
+        {
+          "priority": "soil",
+          "status": "evaluable",
+          "level": "unfavorable",
+          "value": null,
+          "unit": null,
+          "reason": "Planting maize again takes the same things from the soil and lets the same pests carry on.",
+          "evidence": [
+            "demo-rules",
+            "centa-basic-grains",
+            "user-answers"
+          ]
+        },
+        {
+          "priority": "diversification",
+          "status": "evaluable",
+          "level": "unfavorable",
+          "value": null,
+          "unit": null,
+          "reason": "It is the same crop: if it does badly, there is no other one to fall back on.",
+          "evidence": [
+            "demo-rules"
+          ]
+        }
+      ],
+      "sourceIds": [
+        "nasa-power",
+        "demo-rules",
+        "user-answers",
+        "centa-basic-grains"
+      ]
+    },
+    {
+      "id": "maize-bean",
+      "role": "alternative",
+      "sequence": [
+        "maize",
+        "bean"
+      ],
+      "summary": "Beans are from another family: they help the soil and break the pest cycle of the previous crop.",
+      "limitation": "They need steady rain and cannot stand waterlogged soil.",
+      "missingData": "We do not know whether your soil waterlogs. With that detail, this option could move up or down.",
+      "criteria": [
+        {
+          "priority": "water",
+          "status": "evaluable",
+          "level": "neutral",
+          "value": null,
+          "unit": null,
+          "reason": "Beans will need less water than maize, but the rain has to be steady. In the NASA sample there was almost no rain on 3 of 7 days.",
+          "evidence": [
+            "nasa-power",
+            "demo-rules",
+            "user-answers"
+          ]
+        },
+        {
+          "priority": "soil",
+          "status": "evaluable",
+          "level": "favorable",
+          "value": null,
+          "unit": null,
+          "reason": "Beans are a legume: they help put nitrogen back into the soil.",
+          "evidence": [
+            "demo-rules",
+            "centa-basic-grains",
+            "user-answers"
+          ]
+        },
+        {
+          "priority": "diversification",
+          "status": "evaluable",
+          "level": "favorable",
+          "value": null,
+          "unit": null,
+          "reason": "It moves from a grass crop to a legume: two crops from different families spread the risk.",
+          "evidence": [
+            "demo-rules"
+          ]
+        }
+      ],
+      "sourceIds": [
+        "nasa-power",
+        "demo-rules",
+        "user-answers",
+        "centa-basic-grains"
+      ]
+    },
+    {
+      "id": "maize-sorghum",
+      "role": "alternative",
+      "sequence": [
+        "maize",
+        "sorghum"
+      ],
+      "summary": "Sorghum copes better when the rain fails and leaves stubble that covers the soil.",
+      "limitation": "It is a relative of maize: the soil gets less rest than with beans.",
+      "missingData": null,
+      "criteria": [
+        {
+          "priority": "water",
+          "status": "evaluable",
+          "level": "favorable",
+          "value": null,
+          "unit": null,
+          "reason": "Sorghum can cope better with days without rain. In the NASA sample there was almost no rain on 3 of 7 days.",
+          "evidence": [
+            "nasa-power",
+            "demo-rules",
+            "user-answers"
+          ]
+        },
+        {
+          "priority": "soil",
+          "status": "evaluable",
+          "level": "neutral",
+          "value": null,
+          "unit": null,
+          "reason": "It is a change of crop, but sorghum and maize are relatives: the soil gets less rest.",
+          "evidence": [
+            "demo-rules",
+            "centa-basic-grains",
+            "user-answers"
+          ]
+        },
+        {
+          "priority": "diversification",
+          "status": "evaluable",
+          "level": "neutral",
+          "value": null,
+          "unit": null,
+          "reason": "It is a different crop, but from the same family.",
+          "evidence": [
+            "demo-rules"
+          ]
+        }
+      ],
+      "sourceIds": [
+        "nasa-power",
+        "demo-rules",
+        "user-answers",
+        "centa-basic-grains"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "nasa-power",
+      "name": "NASA POWER Daily (MERRA-2)",
+      "note": "Rainfall (PRECTOTCORR, mm/day) and maximum temperature (T2M_MAX, °C) for May 1–7, 2024 at an approximate point in San Miguel. It is a one-week sample used to test the connection.",
+      "url": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M_MAX,T2M_MIN,PRECTOTCORR&community=AG&longitude=-88.45&latitude=13.64&start=20240501&end=20240507&format=JSON",
+      "version": "v2.10.3",
+      "kind": "nasa"
+    },
+    {
+      "id": "centa-basic-grains",
+      "name": "CENTA · Basic Grains Program",
+      "note": "Local reference for maize, beans and sorghum. No value has been taken from its guides yet: page, variety and area still have to be verified.",
+      "url": "https://www.centa.gob.sv/servicios/programa-granos-basicos/",
+      "version": null,
+      "kind": "local-reference"
+    },
+    {
+      "id": "demo-rules",
+      "name": "Yago illustrative rules",
+      "note": "General comparisons between crops (family, water need, waterlogging) used only to show how the app will work.",
+      "url": null,
+      "version": "demo-0.1 (illustrative rules)",
+      "kind": "demo-assumption"
+    },
+    {
+      "id": "user-answers",
+      "name": "What you answered",
+      "note": "The area, current crop, soil and priority you chose in the previous steps.",
+      "url": null,
+      "version": null,
+      "kind": "user-input"
+    }
+  ],
+  "warnings": [
+    "Demo data: a fictitious San Miguel case with illustrative rules.",
+    "The weather is a one-week sample (May 1–7, 2024), not a season reference.",
+    "Information about your soil is missing. The comparison may change once you have it."
+  ],
+  "methodVersion": "demo-0.1 (illustrative rules)",
+  "highlight": {
+    "scenarioId": "maize-sorghum",
+    "priority": "water",
+    "reason": "of the two alternatives, it copes best with a lack of rain"
+  }
+}
