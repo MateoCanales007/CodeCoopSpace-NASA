@@ -1,18 +1,16 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { ComponentRef } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 
-import { recentPeriod } from '../../api/complementaryClimate';
 import type { Priority, Scenario, Site } from '../../api/types';
 import { AppText, Button, DemoBadge, Enter, LanguageToggle, Logo } from '../../components/ui';
 import { useComparison } from '../../hooks/useComparison';
-import { useComplementaryClimate } from '../../hooks/useComplementaryClimate';
 import { useTranslation } from '../../i18n';
 import { WIDE_BREAKPOINT, colors, fonts, isWeb } from '../../theme';
 import type { Answers } from '../../types/answers';
 import { ClimateCard } from './ClimateCard';
 import { ComparisonError, ComparisonLoader } from './ComparisonStatus';
-import { ComplementaryClimateCard } from './ComplementaryClimateCard';
+import { CurrentWeatherCard } from './CurrentWeatherCard';
 import { ExplanationCard } from './ExplanationCard';
 import { PriorityChangeBanner } from './PriorityChangeBanner';
 import { PrioritySwitch } from './PrioritySwitch';
@@ -52,9 +50,8 @@ export function ResultsScreen({ site, answers, onPriorityChange, onEdit, onResta
   const tabs = [{ id: 'comparison', label: text.title }, { id: 'weather', label: text.weatherTab }] as const;
   const priority = answers.priority ?? 'water';
   const { data, loading, failed, change, reload } = useComparison(answers, priority, language);
-  // Meteomatics is context only: the last complete days at the same approximate point.
-  const recent = useMemo(() => recentPeriod(), []);
-  const complementary = useComplementaryClimate(data && site ? { latitude: site.approxLat, longitude: site.approxLon, ...recent } : null, language);
+  const [showOptions, setShowOptions] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
   const scrollRef = useRef<ComponentRef<typeof ScrollView>>(null);
 
   // Bring the explanation into view when the priority change produced one.
@@ -75,7 +72,7 @@ export function ResultsScreen({ site, answers, onPriorityChange, onEdit, onResta
           }}
           style={[styles.tab, item.id === tab && styles.activeTab]}
         >
-          <AppText variant="label" color={item.id === tab ? colors.ivory : colors.ink}>{item.label}</AppText>
+          <AppText variant="body" color={item.id === tab ? colors.ivory : colors.ink}>{item.label}</AppText>
         </Pressable>
       ))}
     </View>
@@ -116,7 +113,7 @@ export function ResultsScreen({ site, answers, onPriorityChange, onEdit, onResta
               <Text style={styles.editText}>{text.change}</Text>
             </Pressable>
           </View>
-          {tab === 'comparison' && soilIsIncomplete ? (
+          {tab === 'comparison' && soilIsIncomplete && showOptions ? (
             <View style={styles.note}>
               <AppText variant="small" color={colors.ink}>{text.missingSoil}</AppText>
             </View>
@@ -140,7 +137,10 @@ export function ResultsScreen({ site, answers, onPriorityChange, onEdit, onResta
               </Enter>
             ) : null}
 
-            <View style={[wide ? styles.cardsWide : styles.cards, loading && styles.refreshing]}>
+            <Pressable accessibilityRole="button" accessibilityState={{ expanded: showOptions }} onPress={() => setShowOptions(!showOptions)} style={styles.disclosure}>
+              <AppText variant="body">{showOptions ? text.hideDetails : text.otherOptions}</AppText>
+            </Pressable>
+            {showOptions ? <View style={[wide ? styles.cardsWide : styles.cards, loading && styles.refreshing]}>
               {scenarios.map((scenario, position) => {
                 const highlighted = scenario.id === highlightedId;
                 return (
@@ -149,18 +149,17 @@ export function ResultsScreen({ site, answers, onPriorityChange, onEdit, onResta
                   </Enter>
                 );
               })}
-            </View>
+            </View> : null}
           </>
         ) : (
           <>
-            <Enter delay={60} style={styles.climate}>
-              {site ? <AppText variant="small">{t.wizard.climateReference(site.name)}</AppText> : null}
+            {site ? <CurrentWeatherCard key={site.id} site={site} /> : null}
+            <Pressable accessibilityRole="button" accessibilityState={{ expanded: showHistory }} onPress={() => setShowHistory(!showHistory)} style={styles.disclosure}>
+              <AppText variant="body">{showHistory ? text.hideDetails : text.weatherHistory}</AppText>
+            </Pressable>
+            {showHistory ? <Enter delay={60} style={styles.climate}>
               <ClimateCard climate={data.climate} sources={data.sources} />
-            </Enter>
-
-            <Enter delay={380} style={styles.climate}>
-              <ComplementaryClimateCard climate={complementary.data} loading={complementary.loading} />
-            </Enter>
+            </Enter> : null}
           </>
         )}
 
@@ -206,6 +205,7 @@ const styles = StyleSheet.create({
   cardColumn: { flex: 1 },
   refreshing: { opacity: 0.45 },
   climate: { marginTop: 16 },
+  disclosure: { marginTop: 16, minHeight: 48, justifyContent: 'center', padding: 12, borderWidth: 1, borderColor: colors.line, borderRadius: 16 },
   explanation: { marginTop: 16 },
   footer: { marginTop: 20, gap: 4 },
   disclaimer: { marginTop: 6 },

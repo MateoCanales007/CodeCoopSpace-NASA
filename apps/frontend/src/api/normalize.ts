@@ -14,6 +14,7 @@ import type {
   ComplementaryClimateDay,
   ComplementaryClimateReason,
   Criterion,
+  CurrentWeather,
   Explanation,
   ExplanationFallbackReason,
   Priority,
@@ -44,6 +45,23 @@ function requireString(parent: Json, key: string, path: string, where: string): 
 
 const optionalString = (value: unknown): string | null => (typeof value === 'string' && value.length > 0 ? value : null);
 const numberOrNull = (value: unknown): number | null => (typeof value === 'number' && Number.isFinite(value) ? value : null);
+
+export function normalizeCurrentWeather(payload: unknown, path: string): CurrentWeather {
+  if (!isObject(payload)) fail(path, 'expected weather object');
+  const status = payload.status;
+  if (status !== 'available' && status !== 'partial' && status !== 'unavailable') fail(path, 'invalid weather status');
+  const point = (value: unknown) => {
+    if (!isObject(value)) fail(path, 'invalid weather point');
+    const validAt = requireString(value, 'validAt', path, 'weather');
+    if (!Number.isFinite(Date.parse(validAt))) fail(path, 'invalid weather time');
+    return { validAt, temperatureC: numberOrNull(value.temperatureC), rainMm: numberOrNull(value.rainMm) };
+  };
+  return {
+    status,
+    current: payload.current == null ? null : point(payload.current),
+    forecast: requireArray(payload, 'forecast', path).map(point),
+  };
+}
 
 export function normalizeSites(payload: unknown, path: string): Site[] {
   if (!Array.isArray(payload)) fail(path, 'expected an array of sites');

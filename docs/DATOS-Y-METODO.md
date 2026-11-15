@@ -14,6 +14,8 @@
 
 Muestra de conectividad: [serie NASA POWER de siete días](../data/samples/power-san-miguel-2024-05.json). Es un subconjunto manual de valores de un punto aproximado en San Miguel, para verificar el parseo. Una semana histórica aislada es insuficiente para una referencia estacional.
 
+La vista «El clima» muestra la temperatura de Meteomatics y el pronóstico de las próximas 24 horas para la cabecera seleccionada. Incluye hora local de validez. La comparación de cultivos se apoya en el historial de NASA POWER y las reglas documentadas abajo. [Documentación de Meteomatics](https://www.meteomatics.com/en/api/getting-started/).
+
 ## Ingesta y calidad
 
 1. Elige un sitio y ventana de referencia con ciencia y dirección. Conserva las fechas y ventanas iguales para los escenarios comparados.

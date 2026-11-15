@@ -155,6 +155,18 @@ export interface ComplementaryClimateQuery {
 /** Why there is no data. `unreachable` is set by this frontend when the server does not answer. */
 export type ComplementaryClimateReason = 'not_configured' | 'auth_failed' | 'timeout' | 'upstream_error' | 'invalid_response' | 'unreachable';
 
+export interface WeatherPoint {
+  validAt: string;
+  temperatureC: number | null;
+  rainMm: number | null;
+}
+
+export interface CurrentWeather {
+  status: 'available' | 'partial' | 'unavailable';
+  current: WeatherPoint | null;
+  forecast: WeatherPoint[];
+}
+
 export interface ComplementaryClimateDay {
   date: string;
   tMaxC: number | null;

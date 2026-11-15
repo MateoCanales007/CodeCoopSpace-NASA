@@ -18,11 +18,11 @@ export const es: Translations = {
   priority: {
     water: { name: 'Cuidar el agua', short: 'Agua', hint: 'Que aguante si la lluvia falla', goal: 'cuidar el agua' },
     soil: { name: 'Proteger el suelo', short: 'Suelo', hint: 'Que la tierra no se canse', goal: 'proteger el suelo' },
-    diversification: { name: 'Diversificar', short: 'Variar', hint: 'No depender de un solo cultivo', goal: 'diversificar' },
+    diversification: { name: 'Cambiar de cultivo', short: 'Variar', hint: 'No depender de un solo cultivo', goal: 'diversificar' },
   },
   texture: {
     sandy: { name: 'Arenosa', hint: 'Suelta, el agua se va rápido', inline: 'arenosa' },
-    loam: { name: 'Franca', hint: 'Ni muy suelta ni muy pegajosa', inline: 'franca' },
+    loam: { name: 'Ni suelta ni pegajosa', hint: 'Ni muy suelta ni muy pegajosa', inline: 'franca' },
     clay: { name: 'Arcillosa', hint: 'Pegajosa, se hace barro', inline: 'arcillosa' },
     unknown: { name: 'No sé', hint: 'Está bien, seguimos sin ese dato', inline: 'no sé' },
   },
@@ -61,8 +61,8 @@ export const es: Translations = {
 
   welcome: {
     title: '¿Qué sembrar después?',
-    lead: 'Compare lo que siembra hoy con dos alternativas, según el agua, el suelo y lo que a usted le importa.',
-    cta: 'Comparar cultivos',
+    lead: 'Díganos dónde siembra y qué tiene sembrado. Le ayudamos a ver qué podría sembrar después.',
+    cta: 'Empezar',
     note: 'Abre directo. Sin cuentas ni contraseñas.',
     previousScene: 'Escena anterior',
     nextScene: 'Escena siguiente',
@@ -79,14 +79,14 @@ export const es: Translations = {
 
   wizard: {
     steps: [
-      { title: '¿Dónde siembra?', help: 'Elija la zona más cercana a su terreno.' },
+      { title: '¿Dónde siembra?', help: 'Busque el departamento donde queda su terreno.' },
       { title: '¿Qué tiene sembrado ahora?', help: 'El cultivo de este ciclo.' },
       { title: '¿Cómo es su tierra?', help: 'Si no está seguro, deje “No sé”.' },
       { title: '¿Qué le importa más?', help: 'Después lo puede cambiar para ver qué pasa.' },
     ],
     stepOf: (step, total) => `Paso ${step} de ${total}`,
     climateReference: (city) => 'Cabecera de referencia: ' + city,
-    siteScaleNote: 'La zona solo se usa para buscar el clima del pasado de NASA, que cubre unos 50 km a la vez. Zonas vecinas pueden mostrar las mismas cifras.',
+    siteScaleNote: 'Usamos la cabecera del departamento como referencia para el clima.',
     sitesLoading: 'Cargando las zonas…',
     sitesEmpty: 'El servidor no devolvió ninguna zona.',
     sitesError: 'No se pudo llegar al servidor para cargar las zonas. Revise su conexión e intente otra vez.',
@@ -95,12 +95,22 @@ export const es: Translations = {
     previousStep: 'Paso anterior',
     chooseOption: 'Elija una opción',
     next: 'Seguir',
-    seeComparison: 'Ver comparación',
+    seeComparison: 'Ver qué puedo sembrar',
   },
 
   results: {
     title: 'Su comparación',
     weatherTab: 'El clima',
+    otherOptions: 'Ver las otras opciones y sus fuentes',
+    weatherNow: 'Temperatura ahora',
+    forecastTitle: 'Pronóstico para las próximas 24 horas',
+    weatherLoading: 'Buscando el clima de su zona…',
+    weatherUnavailable: 'Por ahora no tenemos el clima de su zona.',
+    refreshWeather: 'Actualizar clima',
+    forecastRain: 'Lluvia prevista en las 6 horas hasta esa hora',
+    weatherSource: 'Datos de Meteomatics. Hora de El Salvador.',
+    weatherPartial: 'Faltan algunos datos del clima.',
+    weatherHistory: 'Ver cómo ha sido la lluvia en otros años',
     area: 'Zona',
     currentCrop: (crop) => `hoy tiene ${crop}`,
     soilSummary: (texture, drainage) => `Tierra: ${texture} · Agua: ${drainage}`,

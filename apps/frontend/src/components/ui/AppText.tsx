@@ -12,6 +12,7 @@ interface AppTextProps {
   style?: StyleProp<TextStyle>;
   children: ReactNode;
   numberOfLines?: number;
+  accessibilityLiveRegion?: 'none' | 'polite' | 'assertive';
   accessibilityRole?: 'header' | 'text' | 'link';
 }
 

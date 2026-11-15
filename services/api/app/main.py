@@ -11,7 +11,7 @@ from pydantic import BaseModel
 
 from app.compare import CompareRequest, CompareResponse, build_comparison
 from app.explain import GroqExplainer, Lang
-from app.meteomatics import MeteomaticsClient, MeteomaticsClimate
+from app.meteomatics import CurrentWeather, MeteomaticsClient, MeteomaticsClimate
 from app.power import PowerClient
 from app.sites import SITES, SITES_BY_ID, Site
 
@@ -84,6 +84,17 @@ def meteomatics_climate(
     if end >= datetime.now(UTC).date():
         raise HTTPException(422, "end debe ser un día pasado; esta ruta es histórica.")
     return client.daily(latitude, longitude, start, end)
+
+
+@app.get("/v1/weather/current", response_model=CurrentWeather)
+def current_weather(
+    siteId: str,
+    client: Annotated[MeteomaticsClient, Depends(get_meteomatics_client)],
+) -> CurrentWeather:
+    site = SITES_BY_ID.get(siteId)
+    if site is None:
+        raise HTTPException(422, "siteId no corresponde a una zona soportada.")
+    return client.current_weather(site.approxLat, site.approxLon)
 
 
 @app.get("/v1/sites", response_model=list[Site])

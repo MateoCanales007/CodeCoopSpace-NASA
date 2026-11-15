@@ -26,7 +26,7 @@ export function ExplanationCard({ explanation }: ExplanationCardProps) {
       <View style={styles.heading}>
         <AppText variant="label" color={colors.ink}>{text.explanationTitle}</AppText>
         <View style={[styles.chip, byAi && styles.chipAi]}>
-          <Text style={styles.chipText}>{byAi ? text.explanationAiChip : text.explanationRulesChip}</Text>
+          <Text style={[styles.chipText, byAi && { color: colors.ivory }]}>{byAi ? text.explanationAiChip : text.explanationRulesChip}</Text>
         </View>
       </View>
 
@@ -54,6 +54,6 @@ const styles = StyleSheet.create({
   chipText: { fontFamily: fonts.bold, fontSize: 12, lineHeight: 16, color: colors.inkSoft },
   part: { gap: 2 },
   partLabel: { fontFamily: fonts.bold, fontSize: 13, lineHeight: 17, letterSpacing: 0.9, textTransform: 'uppercase', color: colors.inkSoft },
-  lead: { fontFamily: fonts.semiBold, fontSize: 18, lineHeight: 26, color: colors.ink },
-  body: { fontFamily: fonts.body, fontSize: 16, lineHeight: 24, color: colors.ink },
+  lead: { fontFamily: fonts.semiBold, fontSize: 22, lineHeight: 30, color: colors.ink },
+  body: { fontFamily: fonts.body, fontSize: 18, lineHeight: 26, color: colors.ink },
 });

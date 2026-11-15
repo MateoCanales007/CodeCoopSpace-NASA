@@ -4,6 +4,10 @@ Estado: implementado en `services/api` y consumido por `apps/frontend`. Rutas: `
 
 Los nombres de campos van en camelCase. El texto libre (motivos, notas, advertencias, explicación) llega en el idioma de la cabecera `Accept-Language`: español si empieza con `es`, inglés en cualquier otro caso. El frontend localiza sus propias etiquetas (cultivos, prioridades, niveles, tipo de fuente).
 
+## Clima actual de la zona
+
+Pedir GET /v1/weather/current con siteId de GET /v1/sites. El servidor consulta Meteomatics para el punto de referencia del departamento. current muestra la temperatura modelada, con validAt. forecast contiene hasta cuatro periodos de seis horas con la temperatura al final de cada periodo y lluvia acumulada durante las seis horas anteriores. Los campos sin datos son nulos y la respuesta indica available, partial o unavailable. Las horas de la API están en UTC y la app las muestra en hora de El Salvador. El servidor reutiliza datos dentro del mismo intervalo de 15 minutos.
+
 ## `GET /v1/sites`
 
 Zonas que se pueden elegir: cabeceras departamentales con coordenadas públicas aproximadas, nunca una parcela.

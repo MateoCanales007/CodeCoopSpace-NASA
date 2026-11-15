@@ -1,6 +1,6 @@
 import type { Language } from '../i18n/types';
 import { ApiError } from './ApiError';
-import { normalizeCompareResponse, normalizeComplementaryClimate, normalizeSites } from './normalize';
+import { normalizeCompareResponse, normalizeComplementaryClimate, normalizeCurrentWeather, normalizeSites } from './normalize';
 import type { RotationApi } from './rotationApi';
 
 interface HttpOptions {
@@ -45,6 +45,11 @@ export function createHttpRotationApi({ baseUrl, timeoutMs = 30000 }: HttpOption
     async compareRotations(body, language) {
       const path = '/v1/compare';
       return normalizeCompareResponse(await request(path, language, { method: 'POST', body: JSON.stringify(body) }), path);
+    },
+    async getCurrentWeather(siteId, language) {
+      const path = '/v1/weather/current';
+      const url = path + '?siteId=' + encodeURIComponent(siteId);
+      return normalizeCurrentWeather(await request(url, language), path);
     },
     async getComplementaryClimate(query, language) {
       const path = '/v1/climate/meteomatics';
