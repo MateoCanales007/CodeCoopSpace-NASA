@@ -21,3 +21,4 @@
 | Herramienta | Uso o archivo | Evidencia o revisión humana |
 | --- | --- | --- |
 | Codex | Creación de base de repositorio, documentación técnica y planificación inicial | Pendiente de revisión por CodeCoop Space antes de la entrega |
+| Devin | Cliente Meteomatics en `services/api/app/meteomatics.py`, ruta `/v1/climate/meteomatics`, pruebas y documentación (issue #14) | Pendiente de revisión por CodeCoop Space en el PR |

@@ -23,7 +23,7 @@ CodeCoop Space propone una aplicación para familias que cultivan granos básico
 - **Suelo y cultivos** se documentan con datos aportados por la persona, referencias locales como [CENTA](https://www.centa.gob.sv/servicios/programa-granos-basicos/) y supuestos de demo identificados como tales. Los datos de una cuadrícula describen una zona y tienen una escala distinta a la de una medición en la parcela.
 - **Meteomatics** aporta clima complementario con fecha y fuente identificadas. La comparación basada en NASA debe seguir disponible si falla ese servicio. [Método y límites](docs/DATOS-Y-METODO.md).
 
-La meta del hackatón es una demo reproducible para una localidad. Un juez debe poder cambiar una prioridad, ver el efecto y rastrear al menos un resultado hasta su fuente. Las comparaciones sirven para explorar y conversar con un técnico local. La base actual trae la pantalla inicial, una API con ruta de salud y la muestra de datos. La comparación de rotaciones y Meteomatics están pendientes en el tablero.
+La meta del hackatón es una demo reproducible para una localidad. Un juez debe poder cambiar una prioridad, ver el efecto y rastrear al menos un resultado hasta su fuente. Las comparaciones sirven para explorar y conversar con un técnico local. La base actual trae la pantalla inicial, una API con ruta de salud, la ruta de clima complementario de Meteomatics y la muestra de datos. La comparación de rotaciones está pendiente en el tablero.
 
 ## Evento, evaluación y canjes
 
@@ -62,9 +62,13 @@ py -m venv .venv
 .\.venv\Scripts\python.exe -m uvicorn app.main:app --reload --port 8000
 ```
 
+Para Meteomatics, copia `services/api/.env.example` como `services/api/.env` y completa `METEOMATICS_USERNAME` y `METEOMATICS_PASSWORD`. Git ignora ese archivo y la API lo carga al arrancar. Sin credenciales, `GET /v1/climate/meteomatics` responde `status: "unavailable"` y el resto de la API sigue funcionando.
+
+Pruebas de la API: instala `requirements-dev.txt` y ejecuta `python -m pytest` desde `services/api`. Las pruebas simulan Meteomatics y no usan la red ni credenciales.
+
 En macOS/Linux puedes usar `python3 -m venv .venv` y `.venv/bin/python` en lugar de las rutas de Windows.
 
-Expo indica en la terminal la dirección web, normalmente `http://localhost:8081`. La API arranca en `http://127.0.0.1:8000`. Comprueba `/health` y abre `/docs` para ver OpenAPI. La pantalla actual es el punto de partida, y el único endpoint implementado es salud.
+Expo indica en la terminal la dirección web, normalmente `http://localhost:8081`. La API arranca en `http://127.0.0.1:8000`. Comprueba `/health` y abre `/docs` para ver OpenAPI. La pantalla actual es el punto de partida. Los endpoints implementados son salud y clima complementario de Meteomatics.
 
 `npm run start` abre el menú de Expo para probar en un teléfono compatible o emulador. Cuando el frontend consuma la API desde un teléfono físico, arranca Uvicorn con `--host 0.0.0.0` en una red de confianza y configura `EXPO_PUBLIC_API_URL` en el `.env.local` del frontend con la IP LAN de tu equipo. Toda variable `EXPO_PUBLIC_*` es visible para clientes. Para otro origen web configura `FIELD_SHIFT_WEB_ORIGINS` del servidor con una lista de orígenes exactos.
 
