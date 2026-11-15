@@ -1,13 +1,10 @@
 /**
- * Types of the shared contract (docs/CONTRATO.md, status: proposal).
+ * Types of the shared contract (docs/CONTRATO.md).
  * Fields are camelCase, exactly like the API JSON.
  *
- * Extensions this frontend proposes and the team still has to agree on:
- *  - `soil.texture` and `soil.drainage` values other than "unknown"
- *  - `scenarios[].role`, `summary`, `limitation`, `missingData`
- *  - `highlight`: which alternative stands out for the top priority
- *  - `isDemo`: marks demo data
- *  - text language negotiated with the `Accept-Language` header (en | es)
+ * Every value shown to the farmer comes from the server: there is no bundled
+ * data in the app. Free text (reasons, notes, warnings, explanation) arrives
+ * already written in the language sent with `Accept-Language` (en | es).
  */
 
 export type CropId = 'maize' | 'bean' | 'sorghum';
@@ -34,7 +31,7 @@ export interface CompareRequest {
   priorities: Priority[];
 }
 
-export type SourceKind = 'nasa' | 'local-reference' | 'user-input' | 'demo-assumption';
+export type SourceKind = 'nasa' | 'local-reference' | 'technical-reference' | 'user-input' | 'demo-assumption';
 
 export interface Source {
   id: string;
@@ -45,24 +42,37 @@ export interface Source {
   note: string;
 }
 
+export type ClimateMetricId = 'seasonRainMean' | 'drySpellYears' | 'tMaxMean' | 'precipTotal' | 'dryDays';
+
 export interface ClimateMetric {
-  id: 'precipTotal' | 'dryDays' | 'tMaxMean';
+  id: ClimateMetricId;
   value: number | null;
   unit: string;
-  /** Explicit cause when `value` is null, or a note on how it was computed. */
+  /** For "k of n" figures: the total `value` is read against. */
+  total: number | null;
+  /** What the figure means, already in the UI language. */
+  label: string;
+  /** Explicit cause when `value` is null. */
   reason: string | null;
   sourceId: string;
 }
 
 export interface Climate {
   status: 'available' | 'partial' | 'unavailable';
+  /** `saved-sample` is the one-week historical sample used when NASA POWER does not answer. */
+  kind: 'season-history' | 'saved-sample';
   period: { start: string; end: string };
+  /** The period in words, for example "May to October, 2016–2025". */
+  periodLabel: string;
   coverage: { validDays: number; expectedDays: number };
+  validYears: number;
+  expectedYears: number;
   metrics: ClimateMetric[];
   sourceId: string;
-  /** null until the data team verifies the spatial scale. */
   spatialScale: string | null;
   cacheAgeHours: number | null;
+  /** true when the provider failed and the server answered with a saved copy. */
+  stale: boolean;
   /** Alert the climate data raises in the comparison, if any. */
   alert: { priority: Priority; text: string } | null;
   note: string;
@@ -90,6 +100,8 @@ export interface Scenario {
   missingData: string | null;
   criteria: Criterion[];
   sourceIds: string[];
+  /** true when a hard constraint (waterlogged land) keeps it from being highlighted. */
+  blocked: boolean;
 }
 
 export interface Highlight {
@@ -98,7 +110,25 @@ export interface Highlight {
   reason: string;
 }
 
+export type ExplanationFallbackReason = 'not_configured' | 'timeout' | 'rate_limited' | 'provider_error' | 'invalid_output';
+
+/**
+ * Plain-language explanation of the calculated result. `groq` means an AI model
+ * worded it from the server's figures; `rules` is the server's own short text.
+ */
+export interface Explanation {
+  source: 'groq' | 'rules';
+  model: string | null;
+  /** Why the AI wording was not used when `source` is "rules". */
+  fallbackReason: ExplanationFallbackReason | null;
+  consider: string;
+  influence: string;
+  caution: string;
+  verify: string;
+}
+
 export interface CompareResponse {
+  /** true when the server had to fall back to its saved historical sample. */
   isDemo: boolean;
   climate: Climate;
   scenarios: Scenario[];
@@ -106,4 +136,40 @@ export interface CompareResponse {
   warnings: string[];
   methodVersion: string;
   highlight: Highlight | null;
+  explanation: Explanation | null;
+}
+
+/**
+ * Complementary weather: `GET /v1/climate/meteomatics`.
+ * A modelled product from a second provider. It never feeds the comparison.
+ */
+export interface ComplementaryClimateQuery {
+  /** Approximate public point of the chosen area. */
+  latitude?: number;
+  longitude?: number;
+  /** `YYYY-MM-DD`, at most 31 days, ending in the past. */
+  start?: string;
+  end?: string;
+}
+
+/** Why there is no data. `unreachable` is set by this frontend when the server does not answer. */
+export type ComplementaryClimateReason = 'not_configured' | 'auth_failed' | 'timeout' | 'upstream_error' | 'invalid_response' | 'unreachable';
+
+export interface ComplementaryClimateDay {
+  date: string;
+  tMaxC: number | null;
+  tMinC: number | null;
+  precipMm: number | null;
+}
+
+export interface ComplementaryClimate {
+  source: 'meteomatics';
+  status: 'available' | 'partial' | 'unavailable';
+  reason: ComplementaryClimateReason | null;
+  period: { start: string; end: string };
+  coverage: { validDays: number; expectedDays: number };
+  days: ComplementaryClimateDay[];
+  provenance: { product: string; model: string | null; retrievedAt: string | null; timeStandard: string | null } | null;
+  /** true when the provider failed and the server answered with a saved copy. */
+  stale: boolean;
 }

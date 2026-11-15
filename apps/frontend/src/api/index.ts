@@ -4,31 +4,31 @@
  * ═══════════════════════════════════════════════════════════════════════
  * Screens and hooks only use `rotationApi` (see the `RotationApi` interface).
  *
- * Today it answers with demo data (src/api/demo), so the flow works with the
- * backend switched off.
+ * Everything the farmer sees comes from the team's FastAPI server
+ * (services/api): the areas, the comparison, its explanation and the weather.
+ * The app bundles no data. If the server cannot be reached, the screens say
+ * so and offer to try again.
  *
- * To connect the team's real API:
- *   1. Implement `GET /v1/sites` and `POST /v1/compare` following
- *      docs/CONTRATO.md and the types in src/api/types.ts.
- *   2. In apps/frontend/.env.local set:
- *        EXPO_PUBLIC_USE_API=1
- *        EXPO_PUBLIC_API_URL=http://<ip-or-domain>:8000
- *   3. Restart Expo. No screen needs to change.
+ * Server address:
+ *   - `EXPO_PUBLIC_API_URL` in apps/frontend/.env.local, when it is set.
+ *   - Otherwise, on the web, the same host that serves the page on port 8000,
+ *     so a phone on the same Wi-Fi reaches the server without any setup.
  *
- * Language: the UI asks for English or Spanish text with the `Accept-Language`
- * header (en | es). If the backend answers in a single language, reasons and
- * warnings will show in that language even when the UI switches.
+ * Language: text written by the server is requested with the
+ * `Accept-Language` header (en | es).
  */
-import { createDemoRotationApi } from './demoRotationApi';
 import { createHttpRotationApi } from './httpRotationApi';
 import type { RotationApi } from './rotationApi';
-import { withDemoFallback } from './withDemoFallback';
 
-const USE_API = process.env.EXPO_PUBLIC_USE_API === '1';
-const API_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://127.0.0.1:8000';
+const API_PORT = 8000;
 
-const demoApi = createDemoRotationApi();
+function resolveApiUrl(): string {
+  const configured = process.env.EXPO_PUBLIC_API_URL;
+  if (configured) return configured;
+  const host = typeof window !== 'undefined' ? window.location?.hostname : undefined;
+  return `http://${host || '127.0.0.1'}:${API_PORT}`;
+}
 
-export const rotationApi: RotationApi = USE_API ? withDemoFallback(createHttpRotationApi({ baseUrl: API_URL }), demoApi) : demoApi;
+export const rotationApi: RotationApi = createHttpRotationApi({ baseUrl: resolveApiUrl() });
 
 export type { RotationApi } from './rotationApi';

@@ -1,182 +1,155 @@
 {
-  "isDemo": true,
+  "isDemo": false,
   "climate": {
-    "status": "partial",
+    "status": "available",
+    "kind": "season-history",
     "period": {
-      "start": "2024-05-01",
-      "end": "2024-05-07"
+      "start": "2016-05-01",
+      "end": "2025-10-31"
     },
+    "periodLabel": "mayo a octubre, 2016–2025",
     "coverage": {
-      "validDays": 7,
-      "expectedDays": 7
+      "validDays": 1840,
+      "expectedDays": 1840
     },
+    "validYears": 10,
+    "expectedYears": 10,
     "metrics": [
       {
-        "id": "precipTotal",
-        "value": 18.2,
+        "id": "seasonRainMean",
+        "value": 1272,
         "unit": "mm",
-        "reason": "Suma de la lluvia diaria de los días con dato.",
+        "total": null,
+        "label": "de lluvia por época lluviosa (mayo a octubre), en promedio",
+        "reason": null,
         "sourceId": "nasa-power"
       },
       {
-        "id": "dryDays",
+        "id": "drySpellYears",
         "value": 3,
-        "unit": "días",
-        "reason": "Días con menos de 1 mm de lluvia (umbral de demostración).",
+        "unit": "years",
+        "total": 10,
+        "label": "años con 5 o más días seguidos casi sin lluvia en julio y agosto",
+        "reason": null,
         "sourceId": "nasa-power"
       },
       {
         "id": "tMaxMean",
-        "value": 33.1,
+        "value": 30.7,
         "unit": "°C",
-        "reason": "Promedio de la temperatura máxima diaria.",
+        "total": null,
+        "label": "máxima promedio del día en la época lluviosa",
+        "reason": null,
         "sourceId": "nasa-power"
       }
     ],
     "sourceId": "nasa-power",
-    "spatialScale": null,
+    "spatialScale": "Celda de unos 50 km (0.5° × 0.625°, MERRA-2)",
     "cacheAgeHours": null,
+    "stale": false,
+    "stress": "moderate",
     "alert": {
       "priority": "water",
-      "text": "En esta muestra casi no llovió 3 de 7 días. Por eso, al comparar, pesa más cuánta agua pide cada cultivo."
+      "text": "3 de 10 años (2016–2025) tuvieron 5 o más días seguidos casi sin lluvia en julio y agosto (NASA POWER). Por eso, al comparar, pesa más qué tanto aguanta cada cultivo la falta de agua."
     },
-    "note": "Es clima histórico de una sola semana, no un pronóstico ni un resumen de la temporada. El dato describe una zona amplia, no su parcela."
+    "note": "Es clima del pasado para una zona amplia, no un pronóstico ni una medición de su parcela. Día casi sin lluvia: menos de 1 mm."
   },
   "scenarios": [
     {
-      "id": "maize-maize",
+      "id": "sorghum-sorghum",
       "role": "current",
       "sequence": [
-        "maize",
-        "maize"
-      ],
-      "summary": "Es lo que usted ya conoce: no cambia su forma de trabajar ni lo que compra.",
-      "limitation": "Repetir maíz cansa el suelo y no reparte el riesgo.",
-      "missingData": "Falta saber cómo es su tierra: si es arenosa guarda menos agua y el maíz lo resiente más.",
-      "criteria": [
-        {
-          "priority": "water",
-          "status": "evaluable",
-          "level": "unfavorable",
-          "value": null,
-          "unit": null,
-          "reason": "El maíz pide bastante agua, sobre todo cuando florece. En la muestra de NASA casi no llovió 3 de 7 días.",
-          "evidence": [
-            "nasa-power",
-            "demo-rules",
-            "user-answers"
-          ]
-        },
-        {
-          "priority": "soil",
-          "status": "evaluable",
-          "level": "unfavorable",
-          "value": null,
-          "unit": null,
-          "reason": "Sembrar maíz otra vez saca del suelo lo mismo y deja que sigan las mismas plagas.",
-          "evidence": [
-            "demo-rules",
-            "centa-basic-grains",
-            "user-answers"
-          ]
-        },
-        {
-          "priority": "diversification",
-          "status": "evaluable",
-          "level": "unfavorable",
-          "value": null,
-          "unit": null,
-          "reason": "Es el mismo cultivo: si le va mal, no hay otro que responda.",
-          "evidence": [
-            "demo-rules"
-          ]
-        }
-      ],
-      "sourceIds": [
-        "nasa-power",
-        "demo-rules",
-        "user-answers",
-        "centa-basic-grains"
-      ]
-    },
-    {
-      "id": "maize-bean",
-      "role": "alternative",
-      "sequence": [
-        "maize",
-        "bean"
-      ],
-      "summary": "El frijol es de otra familia: ayuda al suelo y corta el ciclo de las plagas del cultivo anterior.",
-      "limitation": "Necesita lluvia pareja y no aguanta el suelo encharcado.",
-      "missingData": "Falta saber si su tierra se encharca. Con ese dato, esta opción puede subir o bajar.",
-      "criteria": [
-        {
-          "priority": "water",
-          "status": "evaluable",
-          "level": "neutral",
-          "value": null,
-          "unit": null,
-          "reason": "El frijol pide menos agua que el maíz, pero necesita lluvia pareja. En la muestra de NASA casi no llovió 3 de 7 días.",
-          "evidence": [
-            "nasa-power",
-            "demo-rules",
-            "user-answers"
-          ]
-        },
-        {
-          "priority": "soil",
-          "status": "evaluable",
-          "level": "favorable",
-          "value": null,
-          "unit": null,
-          "reason": "El frijol es leguminosa: ayuda a devolverle nitrógeno al suelo.",
-          "evidence": [
-            "demo-rules",
-            "centa-basic-grains",
-            "user-answers"
-          ]
-        },
-        {
-          "priority": "diversification",
-          "status": "evaluable",
-          "level": "favorable",
-          "value": null,
-          "unit": null,
-          "reason": "Pasa de gramínea a leguminosa: dos cultivos de familias distintas reparten el riesgo.",
-          "evidence": [
-            "demo-rules"
-          ]
-        }
-      ],
-      "sourceIds": [
-        "nasa-power",
-        "demo-rules",
-        "user-answers",
-        "centa-basic-grains"
-      ]
-    },
-    {
-      "id": "maize-sorghum",
-      "role": "alternative",
-      "sequence": [
-        "maize",
+        "sorghum",
         "sorghum"
       ],
-      "summary": "El maicillo aguanta mejor cuando la lluvia falla y deja rastrojo que cubre el suelo.",
-      "limitation": "Es pariente del maíz: el suelo descansa menos que con frijol.",
-      "missingData": null,
+      "summary": "Seguir con maicillo otra vez. Es el mismo cultivo: no diversifica.",
+      "limitation": "Es el mismo cultivo: no diversifica.",
+      "missingData": "Falta confirmar: la textura de su tierra (cambia cuánta agua guarda).",
       "criteria": [
+        {
+          "priority": "diversification",
+          "status": "evaluable",
+          "level": "unfavorable",
+          "value": 0,
+          "unit": "0-2",
+          "reason": "Es el mismo cultivo: no diversifica.",
+          "evidence": [
+            "method-rules"
+          ]
+        },
         {
           "priority": "water",
           "status": "evaluable",
           "level": "favorable",
+          "value": 0.9,
+          "unit": "Ky",
+          "reason": "El maicillo aguanta mejor la falta de agua: su factor Ky es 0.9 (FAO; menor que 1 = tolerante). En esta zona, 3 de 10 años (2016–2025) tuvieron 5 o más días seguidos casi sin lluvia en julio y agosto (NASA POWER). La lluvia total alcanza (1272 mm en promedio de mayo a octubre; CENTA indica 550 mm para el ciclo): el riesgo está en las rachas secas.",
+          "evidence": [
+            "fao-ky",
+            "nasa-power",
+            "drought-definition",
+            "centa-guides"
+          ]
+        },
+        {
+          "priority": "soil",
+          "status": "evaluable",
+          "level": "unfavorable",
           "value": null,
           "unit": null,
-          "reason": "El maicillo aguanta mejor los días sin lluvia. En la muestra de NASA casi no llovió 3 de 7 días.",
+          "reason": "Repetir maicillo no es una rotación: se pierde lo que da cambiar de cultivo, como cortar sus plagas y enfermedades (FAO).",
           "evidence": [
-            "nasa-power",
-            "demo-rules",
+            "rotation-principle",
             "user-answers"
+          ]
+        }
+      ],
+      "sourceIds": [
+        "method-rules",
+        "fao-ky",
+        "nasa-power",
+        "drought-definition",
+        "centa-guides",
+        "rotation-principle",
+        "user-answers"
+      ],
+      "score": 6,
+      "blocked": false
+    },
+    {
+      "id": "sorghum-maize",
+      "role": "alternative",
+      "sequence": [
+        "sorghum",
+        "maize"
+      ],
+      "summary": "Sembrar maíz después de maicillo. Cambia el cultivo, pero maicillo y maíz son de la misma familia (gramíneas).",
+      "limitation": "El maíz pierde más cosecha cuando falta agua: su factor Ky es 1.25 (FAO; mayor que 1 = sensible).",
+      "missingData": "Falta confirmar: la textura de su tierra (cambia cuánta agua guarda).",
+      "criteria": [
+        {
+          "priority": "diversification",
+          "status": "evaluable",
+          "level": "neutral",
+          "value": 1,
+          "unit": "0-2",
+          "reason": "Cambia el cultivo, pero maicillo y maíz son de la misma familia (gramíneas).",
+          "evidence": [
+            "method-rules"
+          ]
+        },
+        {
+          "priority": "water",
+          "status": "evaluable",
+          "level": "unfavorable",
+          "value": 1.25,
+          "unit": "Ky",
+          "reason": "El maíz pierde más cosecha cuando falta agua: su factor Ky es 1.25 (FAO; mayor que 1 = sensible). En esta zona, 3 de 10 años (2016–2025) tuvieron 5 o más días seguidos casi sin lluvia en julio y agosto (NASA POWER). La lluvia total alcanza (1272 mm en promedio de mayo a octubre; CENTA indica 500 a 700 mm para el ciclo): el riesgo está en las rachas secas.",
+          "evidence": [
+            "fao-ky",
+            "nasa-power",
+            "drought-definition",
+            "centa-guides"
           ]
         },
         {
@@ -185,76 +158,163 @@
           "level": "neutral",
           "value": null,
           "unit": null,
-          "reason": "Cambia de cultivo, pero el maicillo y el maíz son parientes: el suelo descansa menos.",
+          "reason": "Cambia el cultivo, pero maicillo y maíz son cereales: no entra una leguminosa, que es la que fija nitrógeno.",
           "evidence": [
-            "demo-rules",
-            "centa-basic-grains",
+            "rotation-principle",
             "user-answers"
-          ]
-        },
-        {
-          "priority": "diversification",
-          "status": "evaluable",
-          "level": "neutral",
-          "value": null,
-          "unit": null,
-          "reason": "Es otro cultivo, pero de la misma familia.",
-          "evidence": [
-            "demo-rules"
           ]
         }
       ],
       "sourceIds": [
+        "method-rules",
+        "fao-ky",
         "nasa-power",
-        "demo-rules",
-        "user-answers",
-        "centa-basic-grains"
-      ]
+        "drought-definition",
+        "centa-guides",
+        "rotation-principle",
+        "user-answers"
+      ],
+      "score": 10,
+      "blocked": false
+    },
+    {
+      "id": "sorghum-bean",
+      "role": "alternative",
+      "sequence": [
+        "sorghum",
+        "bean"
+      ],
+      "summary": "Sembrar frijol después de maicillo. Cambia el cultivo y también la familia (un cereal y una leguminosa).",
+      "limitation": "El frijol pierde más cosecha cuando falta agua: su factor Ky es 1.15 (FAO; mayor que 1 = sensible).",
+      "missingData": "Falta confirmar: la textura de su tierra (cambia cuánta agua guarda).",
+      "criteria": [
+        {
+          "priority": "diversification",
+          "status": "evaluable",
+          "level": "favorable",
+          "value": 2,
+          "unit": "0-2",
+          "reason": "Cambia el cultivo y también la familia (un cereal y una leguminosa).",
+          "evidence": [
+            "method-rules"
+          ]
+        },
+        {
+          "priority": "water",
+          "status": "evaluable",
+          "level": "neutral",
+          "value": 1.15,
+          "unit": "Ky",
+          "reason": "El frijol pierde más cosecha cuando falta agua: su factor Ky es 1.15 (FAO; mayor que 1 = sensible). En esta zona, 3 de 10 años (2016–2025) tuvieron 5 o más días seguidos casi sin lluvia en julio y agosto (NASA POWER). La lluvia total alcanza (1272 mm en promedio de mayo a octubre; CENTA indica 228 mm para el ciclo): el riesgo está en las rachas secas.",
+          "evidence": [
+            "fao-ky",
+            "nasa-power",
+            "drought-definition",
+            "centa-guides"
+          ]
+        },
+        {
+          "priority": "soil",
+          "status": "evaluable",
+          "level": "favorable",
+          "value": null,
+          "unit": null,
+          "reason": "El frijol es leguminosa y fija nitrógeno (CENTA). Sembrarlo después de maicillo es una rotación, que además corta plagas y enfermedades (FAO).",
+          "evidence": [
+            "rotation-principle",
+            "centa-guides",
+            "user-answers"
+          ]
+        }
+      ],
+      "sourceIds": [
+        "method-rules",
+        "fao-ky",
+        "nasa-power",
+        "drought-definition",
+        "centa-guides",
+        "rotation-principle",
+        "user-answers"
+      ],
+      "score": 23,
+      "blocked": false
     }
   ],
+  "highlight": {
+    "scenarioId": "sorghum-bean",
+    "priority": "diversification",
+    "reason": "Maicillo → Frijol es la opción mejor valorada (diversificar: ayuda, agua: regular, suelo: ayuda)"
+  },
+  "explanation": {
+    "consider": "Para diversificar, vale la pena considerar Maicillo → Frijol. Cambia el cultivo y también la familia (un cereal y una leguminosa).",
+    "influence": "Pesó lo que usted eligió como más importante (diversificar) y el clima del pasado de NASA. En esta zona, 3 de 10 años (2016–2025) tuvieron 5 o más días seguidos casi sin lluvia en julio y agosto (NASA POWER).",
+    "caution": "El frijol pierde más cosecha cuando falta agua: su factor Ky es 1.15 (FAO; mayor que 1 = sensible).",
+    "verify": "Antes de sembrar confirme: la textura de su tierra (cambia cuánta agua guarda). Converse también con un técnico de su zona.",
+    "source": "rules",
+    "model": null,
+    "fallbackReason": "not_configured"
+  },
   "sources": [
     {
       "id": "nasa-power",
-      "name": "NASA POWER Daily (MERRA-2)",
-      "note": "Lluvia (PRECTOTCORR, mm/día) y temperatura máxima (T2M_MAX, °C) del 1 al 7 de mayo de 2024 en un punto aproximado de San Miguel. Es una muestra de una semana para probar la conexión.",
-      "url": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M_MAX,T2M_MIN,PRECTOTCORR&community=AG&longitude=-88.45&latitude=13.64&start=20240501&end=20240507&format=JSON",
-      "version": "v2.10.3",
-      "kind": "nasa"
+      "name": "NASA POWER Daily API",
+      "url": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M_MAX,PRECTOTCORR&community=AG&longitude=-88.45&latitude=13.64&start=20160501&end=20251031&format=JSON",
+      "version": "v2.10.3 · MERRA2/POWER",
+      "kind": "nasa",
+      "note": "Lluvia (PRECTOTCORR, mm/día) y temperatura máxima (T2M_MAX, °C) diarias para el punto aproximado de la zona. Describe una celda de unos 50 km, no una parcela."
     },
     {
-      "id": "centa-basic-grains",
-      "name": "CENTA · Programa de Granos Básicos",
-      "note": "Referencia local para maíz, frijol y maicillo. Todavía no se ha tomado ningún valor de sus guías: falta verificar página, variedad y zona.",
+      "id": "fao-ky",
+      "name": "FAO-56, cuadro 24, y FAO-66, cuadro 1: factor Ky",
+      "url": "https://www.fao.org/4/x0490e/x0490e0e.htm",
+      "version": "1998 / 2012",
+      "kind": "technical-reference",
+      "note": "Ky de toda la temporada (de FAO-33): maíz 1.25, frijol 1.15, sorgo 0.9. Según FAO-66, con Ky mayor que 1 el cultivo es muy sensible a la falta de agua y con Ky menor que 1 es más tolerante. Son valores generales, no medidos en El Salvador."
+    },
+    {
+      "id": "centa-guides",
+      "name": "CENTA: guías técnicas de maíz, frijol y sorgo",
       "url": "https://www.centa.gob.sv/servicios/programa-granos-basicos/",
-      "version": null,
-      "kind": "local-reference"
+      "version": "2018",
+      "kind": "local-reference",
+      "note": "Maíz: al menos 500 a 700 mm de lluvia bien distribuida y muy sensible al encharcamiento (p. 8). Frijol: consumo promedio de 228 mm (p. 15), no tolera acumulación de agua (p. 16), fija nitrógeno (p. 9) y se rota con cultivos no hospederos contra enfermedades (p. 30). Sorgo: 550 mm (p. 8) y muy tolerante a la sequía (p. 15). Leídas en copias archivadas de los enlaces oficiales de descarga."
     },
     {
-      "id": "demo-rules",
-      "name": "Reglas ilustrativas de Yago",
-      "note": "Comparaciones generales entre cultivos (familia, necesidad de agua, encharcamiento) usadas solo para mostrar cómo funcionará la app.",
-      "url": null,
-      "version": "demo-0.1 (reglas ilustrativas)",
-      "kind": "demo-assumption"
+      "id": "drought-definition",
+      "name": "MARN: sequía meteorológica y día seco",
+      "url": "https://www.snet.gob.sv/ver/meteorologia/clima/sequia+meteorologica/",
+      "version": null,
+      "kind": "local-reference",
+      "note": "Sequía meteorológica débil: 5 a 10 días secos consecutivos en la época lluviosa; moderada: 11 a 15; fuerte: más de 15. Día seco: menos de 1 mm en 24 horas (Resumen climatológico de julio de 2023, p. 5)."
+    },
+    {
+      "id": "rotation-principle",
+      "name": "FAO: agricultura de conservación, diversificación de especies",
+      "url": "https://www.fao.org/conservation-agriculture/in-practice/species-diversification/en/",
+      "version": null,
+      "kind": "technical-reference",
+      "note": "La rotación evita que plagas y enfermedades propias de un cultivo pasen al siguiente y aumenta la fijación de nitrógeno. La ficha «Save and Grow» de maíz y leguminosas (FAO, 2015) añade que esa rotación ayuda a mantener la fertilidad."
     },
     {
       "id": "user-answers",
-      "name": "Lo que usted respondió",
-      "note": "Zona, cultivo actual, suelo y prioridad que eligió en los pasos anteriores.",
+      "name": "Sus respuestas en el formulario",
       "url": null,
       "version": null,
-      "kind": "user-input"
+      "kind": "user-input",
+      "note": "Textura y drenaje del suelo según lo que usted respondió. No se comprueba en el terreno."
+    },
+    {
+      "id": "method-rules",
+      "name": "Supuestos del método de Yago",
+      "url": null,
+      "version": null,
+      "kind": "demo-assumption",
+      "note": "Decisiones ilustrativas del equipo, sin validación local: la zona pasa a falta de lluvia media si 2 de cada 10 años tuvieron racha seca y a alta si fue la mitad o más; el suelo arenoso sube un nivel; Ky de 1.2 o más cuenta como muy sensible; repetir cultivo, cambiar dentro de la familia y cambiar de familia valen 0, 1 y 2; manda la prioridad principal y las otras desempatan."
     }
   ],
   "warnings": [
-    "Datos de demostración: caso ficticio de San Miguel con reglas ilustrativas.",
-    "El clima es una muestra de una semana (1–7 de mayo de 2024), no una referencia de temporada.",
-    "Falta información de su suelo. La comparación puede cambiar cuando la tenga."
+    "Falta confirmar: la textura de su tierra (cambia cuánta agua guarda).",
+    "Cómo se ordena: manda lo que usted eligió como más importante y lo demás solo desempata. Los umbrales para clasificar la falta de lluvia son supuestos ilustrativos del método, no valores de una fuente."
   ],
-  "methodVersion": "demo-0.1 (reglas ilustrativas)",
-  "highlight": {
-    "scenarioId": "maize-sorghum",
-    "priority": "water",
-    "reason": "de las dos alternativas, es la que mejor aguanta la falta de lluvia"
-  }
+  "methodVersion": "yago-reglas-0.2.0"
 }

@@ -24,7 +24,7 @@ const EDIT_STEP = 1;
 export function RootNavigator() {
   const reduced = useReducedMotion();
   const { language } = useTranslation();
-  const sites = useSites(language);
+  const { sites, loading: sitesLoading, failed: sitesFailed, reload: reloadSites } = useSites(language);
   const [screen, setScreen] = useState<ScreenName>('welcome');
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Answers>(EMPTY_ANSWERS);
@@ -72,6 +72,9 @@ export function RootNavigator() {
       {screen === 'wizard' ? (
         <WizardScreen
           sites={sites}
+          sitesLoading={sitesLoading}
+          sitesFailed={sitesFailed}
+          onRetrySites={reloadSites}
           answers={answers}
           onChange={updateAnswers}
           step={step}

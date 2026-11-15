@@ -1,4 +1,4 @@
-import type { CropId, Priority, SoilDrainage, SoilTexture, SourceKind } from '../api/types';
+import type { ComplementaryClimateReason, CropId, ExplanationFallbackReason, Priority, SoilDrainage, SoilTexture, SourceKind } from '../api/types';
 import type { LevelKey } from '../constants/domain';
 import type { SceneKey } from './types';
 
@@ -11,7 +11,7 @@ const parseDate = (iso: string) => iso.split('-').map(Number);
 /** English is the default language and the source of truth for the `Translations` shape. */
 export const en = {
   documentTitle: 'Yago · What to plant next?',
-  demoData: 'Demo data',
+  demoData: 'Demo mode',
   backToStart: 'Back to start',
   language: 'Language',
 
@@ -45,8 +45,9 @@ export const en = {
   sourceKind: {
     nasa: 'NASA data',
     'local-reference': 'Local reference',
+    'technical-reference': 'Technical reference',
     'user-input': 'Your answer',
-    'demo-assumption': 'Demo assumption',
+    'demo-assumption': 'Method assumption',
   } as Record<SourceKind, string>,
 
   /** "2024-05-01" + "2024-05-07" → "May 1–7, 2024" */
@@ -55,6 +56,11 @@ export const en = {
     const [endYear, endMonth, endDay] = parseDate(end);
     if (startYear === endYear && startMonth === endMonth) return `${MONTHS[startMonth - 1]} ${startDay}–${endDay}, ${startYear}`;
     return `${MONTHS[startMonth - 1]} ${startDay}, ${startYear} – ${MONTHS[endMonth - 1]} ${endDay}, ${endYear}`;
+  },
+  /** "2026-11-14" → "November 14, 2026" */
+  formatDay: (iso: string): string => {
+    const [year, month, day] = parseDate(iso);
+    return `${MONTHS[month - 1]} ${day}, ${year}`;
   },
 
   welcome: {
@@ -83,8 +89,11 @@ export const en = {
       { title: 'What matters most to you?', help: 'You can change it later to see what happens.' },
     ],
     stepOf: (step: number, total: number) => `Step ${step} of ${total}`,
-    demoSiteHint: 'Example area · eastern El Salvador',
-    singleSiteNote: 'For now there is only one example area. More will come when the team connects the data.',
+    climateReference: (city: string) => 'Reference city: ' + city,
+    siteScaleNote: 'The area is only used to look up past weather from NASA, which covers about 50 km at a time. Nearby areas can show the same figures.',
+    sitesLoading: 'Loading the areas…',
+    sitesEmpty: 'The server did not return any area.',
+    sitesError: 'Could not reach the server to load the areas. Check your connection and try again.',
     textureQuestion: 'When you hold it in your hand, it is…',
     drainageQuestion: 'When it rains hard, the water…',
     previousStep: 'Previous step',
@@ -95,6 +104,7 @@ export const en = {
 
   results: {
     title: 'Your comparison',
+    weatherTab: 'Weather',
     area: 'Area',
     currentCrop: (crop: string) => `${crop} today`,
     soilSummary: (texture: string, drainage: string) => `Soil: ${texture} · Water: ${drainage}`,
@@ -114,6 +124,9 @@ export const en = {
     openSource: 'Open the source ↗',
     openSourceLabel: (name: string) => `Open source: ${name}`,
     climateTitle: 'Past weather for the area',
+    climateSampleTitle: 'Saved weather sample',
+    outOf: (value: number, total: number) => `${value} of ${total}`,
+    yearsCoverage: (valid: number, expected: number) => `${valid} of ${expected} years with complete data.`,
     noData: 'No data',
     rainIn: (days: number) => `of rain in ${days} days`,
     dryDaysOf: (dry: number, days: number) => `${dry} of ${days}`,
@@ -124,9 +137,39 @@ export const en = {
     coverage: (valid: number, expected: number) => `${valid} of ${expected} days with data.`,
     openNasaQuery: 'Open the NASA query ↗',
     openNasaQueryLabel: 'Open the NASA POWER query',
+    complementaryChip: 'Meteomatics',
+    complementaryTitle: 'Recent weather, second source',
+    complementaryLoading: 'Asking Meteomatics…',
+    minTempCaption: 'average daily low',
+    retrieved: (date: string) => `Retrieved ${date}.`,
+    complementaryNote:
+      'Modelled weather for the last few days from another provider, shown as context. It does not change the comparison, which uses the NASA history above. Its days run on UTC time.',
+    complementaryStale: 'The provider did not answer just now. This is a saved copy.',
+    complementaryIndependent: 'The comparison does not depend on it: it uses the NASA history above.',
+    complementaryReason: {
+      not_configured: 'Meteomatics is not set up on the server yet.',
+      auth_failed: 'Meteomatics rejected the server’s access, or the trial has ended.',
+      timeout: 'Meteomatics took too long to answer.',
+      upstream_error: 'Meteomatics returned an error.',
+      invalid_response: 'Meteomatics answered in a format we could not read.',
+      unreachable: 'Could not reach the server to ask Meteomatics.',
+    } as Record<ComplementaryClimateReason, string>,
+    explanationTitle: 'In short',
+    explanationAiChip: 'AI wording',
+    explanationRulesChip: 'Automatic summary',
+    explanationLabels: { consider: 'What to consider', influence: 'What weighed most', caution: 'Watch out', verify: 'Before sowing' },
+    explanationByAi: (model: string) => `Worded by an AI model (Groq · ${model}) from the result the rules calculated. The crops, figures, ratings and sources do not come from the AI.`,
+    explanationByRules: 'Short summary written by the rules, without AI.',
+    explanationFallback: {
+      not_configured: 'The AI wording is not set up on the server.',
+      timeout: 'The AI took too long to answer.',
+      rate_limited: 'The AI reached its usage limit for now.',
+      provider_error: 'The AI service failed.',
+      invalid_output: 'The AI answer did not pass the checks and was discarded.',
+    } as Record<ExplanationFallbackReason, string>,
     comparing: 'Comparing crops…',
     errorTitle: 'Could not compare',
-    errorText: 'Check your connection and try again.',
+    errorText: 'Could not reach the server. Check your connection and try again.',
     retry: 'Try again',
     disclaimer: (method: string) => `Yago is for exploring and for talking with an extension agent in your area. It does not predict harvests or replace a field visit. Method: ${method}.`,
     startOver: 'Start over',

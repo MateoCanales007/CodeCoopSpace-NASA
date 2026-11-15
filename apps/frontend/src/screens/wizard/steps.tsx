@@ -23,17 +23,15 @@ function SiteStep({ sites, answers, onChange }: StepProps) {
         <ChoiceCard
           key={site.id}
           icon="location"
-          title={site.name}
-          hint={site.isDemo ? t.wizard.demoSiteHint : site.department}
+          title={site.department || site.name}
+          hint={site.department ? t.wizard.climateReference(site.name) : undefined}
           selected={answers.siteId === site.id}
           onPress={() => onChange({ siteId: site.id })}
         />
       ))}
-      {sites.length === 1 ? (
-        <View style={styles.note}>
-          <AppText variant="small">{t.wizard.singleSiteNote}</AppText>
-        </View>
-      ) : null}
+      <View style={styles.note}>
+        <AppText variant="small">{t.wizard.siteScaleNote}</AppText>
+      </View>
     </View>
   );
 }

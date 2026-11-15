@@ -1,182 +1,155 @@
 {
-  "isDemo": true,
+  "isDemo": false,
   "climate": {
-    "status": "partial",
+    "status": "available",
+    "kind": "season-history",
     "period": {
-      "start": "2024-05-01",
-      "end": "2024-05-07"
+      "start": "2016-05-01",
+      "end": "2025-10-31"
     },
+    "periodLabel": "May to October, 2016–2025",
     "coverage": {
-      "validDays": 7,
-      "expectedDays": 7
+      "validDays": 1840,
+      "expectedDays": 1840
     },
+    "validYears": 10,
+    "expectedYears": 10,
     "metrics": [
       {
-        "id": "precipTotal",
-        "value": 18.2,
+        "id": "seasonRainMean",
+        "value": 1272,
         "unit": "mm",
-        "reason": "Sum of daily rainfall over the days with data.",
+        "total": null,
+        "label": "of rain per rainy season (May to October), on average",
+        "reason": null,
         "sourceId": "nasa-power"
       },
       {
-        "id": "dryDays",
+        "id": "drySpellYears",
         "value": 3,
-        "unit": "days",
-        "reason": "Days with less than 1 mm of rain (demo threshold).",
+        "unit": "years",
+        "total": 10,
+        "label": "years with 5 or more days in a row with almost no rain in July and August",
+        "reason": null,
         "sourceId": "nasa-power"
       },
       {
         "id": "tMaxMean",
-        "value": 33.1,
+        "value": 30.7,
         "unit": "°C",
-        "reason": "Average of the daily maximum temperature.",
+        "total": null,
+        "label": "average daily high in the rainy season",
+        "reason": null,
         "sourceId": "nasa-power"
       }
     ],
     "sourceId": "nasa-power",
-    "spatialScale": null,
+    "spatialScale": "Cell of about 50 km (0.5° × 0.625°, MERRA-2)",
     "cacheAgeHours": null,
+    "stale": false,
+    "stress": "moderate",
     "alert": {
       "priority": "water",
-      "text": "In this sample there was almost no rain on 3 of 7 days. That is why, when comparing, how much water each crop needs counts more."
+      "text": "3 of 10 years (2016–2025) had 5 or more days in a row with almost no rain in July and August (NASA POWER). That is why, when comparing, how well each crop copes with a lack of water counts more."
     },
-    "note": "This is past weather for a single week, not a forecast or a season summary. It describes a wide area, not your plot."
+    "note": "This is past weather for a wide area, not a forecast or a measurement of your plot. Day with almost no rain: under 1 mm."
   },
   "scenarios": [
     {
-      "id": "maize-maize",
+      "id": "sorghum-sorghum",
       "role": "current",
       "sequence": [
-        "maize",
-        "maize"
-      ],
-      "summary": "It is what you already know: no change in how you work or in what you buy.",
-      "limitation": "Repeating maize wears out the soil and does not spread the risk.",
-      "missingData": "We do not know what your soil is like: sandy soil holds less water and maize suffers more.",
-      "criteria": [
-        {
-          "priority": "water",
-          "status": "evaluable",
-          "level": "unfavorable",
-          "value": null,
-          "unit": null,
-          "reason": "Maize will need a lot of water, especially at flowering. In the NASA sample there was almost no rain on 3 of 7 days.",
-          "evidence": [
-            "nasa-power",
-            "demo-rules",
-            "user-answers"
-          ]
-        },
-        {
-          "priority": "soil",
-          "status": "evaluable",
-          "level": "unfavorable",
-          "value": null,
-          "unit": null,
-          "reason": "Planting maize again takes the same things from the soil and lets the same pests carry on.",
-          "evidence": [
-            "demo-rules",
-            "centa-basic-grains",
-            "user-answers"
-          ]
-        },
-        {
-          "priority": "diversification",
-          "status": "evaluable",
-          "level": "unfavorable",
-          "value": null,
-          "unit": null,
-          "reason": "It is the same crop: if it does badly, there is no other one to fall back on.",
-          "evidence": [
-            "demo-rules"
-          ]
-        }
-      ],
-      "sourceIds": [
-        "nasa-power",
-        "demo-rules",
-        "user-answers",
-        "centa-basic-grains"
-      ]
-    },
-    {
-      "id": "maize-bean",
-      "role": "alternative",
-      "sequence": [
-        "maize",
-        "bean"
-      ],
-      "summary": "Beans are from another family: they help the soil and break the pest cycle of the previous crop.",
-      "limitation": "They need steady rain and cannot stand waterlogged soil.",
-      "missingData": "We do not know whether your soil waterlogs. With that detail, this option could move up or down.",
-      "criteria": [
-        {
-          "priority": "water",
-          "status": "evaluable",
-          "level": "neutral",
-          "value": null,
-          "unit": null,
-          "reason": "Beans will need less water than maize, but the rain has to be steady. In the NASA sample there was almost no rain on 3 of 7 days.",
-          "evidence": [
-            "nasa-power",
-            "demo-rules",
-            "user-answers"
-          ]
-        },
-        {
-          "priority": "soil",
-          "status": "evaluable",
-          "level": "favorable",
-          "value": null,
-          "unit": null,
-          "reason": "Beans are a legume: they help put nitrogen back into the soil.",
-          "evidence": [
-            "demo-rules",
-            "centa-basic-grains",
-            "user-answers"
-          ]
-        },
-        {
-          "priority": "diversification",
-          "status": "evaluable",
-          "level": "favorable",
-          "value": null,
-          "unit": null,
-          "reason": "It moves from a grass crop to a legume: two crops from different families spread the risk.",
-          "evidence": [
-            "demo-rules"
-          ]
-        }
-      ],
-      "sourceIds": [
-        "nasa-power",
-        "demo-rules",
-        "user-answers",
-        "centa-basic-grains"
-      ]
-    },
-    {
-      "id": "maize-sorghum",
-      "role": "alternative",
-      "sequence": [
-        "maize",
+        "sorghum",
         "sorghum"
       ],
-      "summary": "Sorghum copes better when the rain fails and leaves stubble that covers the soil.",
-      "limitation": "It is a relative of maize: the soil gets less rest than with beans.",
-      "missingData": null,
+      "summary": "Keep growing sorghum. It is the same crop: it does not diversify.",
+      "limitation": "It is the same crop: it does not diversify.",
+      "missingData": "Still to confirm: your soil texture (it changes how much water it holds).",
       "criteria": [
+        {
+          "priority": "diversification",
+          "status": "evaluable",
+          "level": "unfavorable",
+          "value": 0,
+          "unit": "0-2",
+          "reason": "It is the same crop: it does not diversify.",
+          "evidence": [
+            "method-rules"
+          ]
+        },
         {
           "priority": "water",
           "status": "evaluable",
           "level": "favorable",
+          "value": 0.9,
+          "unit": "Ky",
+          "reason": "Sorghum copes better with a lack of water: the Ky factor is 0.9 (FAO; below 1 = tolerant). In this area, 3 of 10 years (2016–2025) had 5 or more days in a row with almost no rain in July and August (NASA POWER). Total rain is enough (1272 mm on average from May to October; CENTA gives 550 mm for the cycle): the risk is in the dry spells.",
+          "evidence": [
+            "fao-ky",
+            "nasa-power",
+            "drought-definition",
+            "centa-guides"
+          ]
+        },
+        {
+          "priority": "soil",
+          "status": "evaluable",
+          "level": "unfavorable",
           "value": null,
           "unit": null,
-          "reason": "Sorghum can cope better with days without rain. In the NASA sample there was almost no rain on 3 of 7 days.",
+          "reason": "Growing sorghum again is not a rotation: you lose what changing crops gives, such as breaking its pests and diseases (FAO).",
           "evidence": [
-            "nasa-power",
-            "demo-rules",
+            "rotation-principle",
             "user-answers"
+          ]
+        }
+      ],
+      "sourceIds": [
+        "method-rules",
+        "fao-ky",
+        "nasa-power",
+        "drought-definition",
+        "centa-guides",
+        "rotation-principle",
+        "user-answers"
+      ],
+      "score": 6,
+      "blocked": false
+    },
+    {
+      "id": "sorghum-maize",
+      "role": "alternative",
+      "sequence": [
+        "sorghum",
+        "maize"
+      ],
+      "summary": "Sow maize after sorghum. The crop changes, but sorghum and maize belong to the same family (grasses).",
+      "limitation": "Maize loses more yield when water is short: the Ky factor is 1.25 (FAO; above 1 = sensitive).",
+      "missingData": "Still to confirm: your soil texture (it changes how much water it holds).",
+      "criteria": [
+        {
+          "priority": "diversification",
+          "status": "evaluable",
+          "level": "neutral",
+          "value": 1,
+          "unit": "0-2",
+          "reason": "The crop changes, but sorghum and maize belong to the same family (grasses).",
+          "evidence": [
+            "method-rules"
+          ]
+        },
+        {
+          "priority": "water",
+          "status": "evaluable",
+          "level": "unfavorable",
+          "value": 1.25,
+          "unit": "Ky",
+          "reason": "Maize loses more yield when water is short: the Ky factor is 1.25 (FAO; above 1 = sensitive). In this area, 3 of 10 years (2016–2025) had 5 or more days in a row with almost no rain in July and August (NASA POWER). Total rain is enough (1272 mm on average from May to October; CENTA gives 500 to 700 mm for the cycle): the risk is in the dry spells.",
+          "evidence": [
+            "fao-ky",
+            "nasa-power",
+            "drought-definition",
+            "centa-guides"
           ]
         },
         {
@@ -185,76 +158,163 @@
           "level": "neutral",
           "value": null,
           "unit": null,
-          "reason": "It is a change of crop, but sorghum and maize are relatives: the soil gets less rest.",
+          "reason": "The crop changes, but sorghum and maize are both cereals: no legume comes in, and legumes are the ones that fix nitrogen.",
           "evidence": [
-            "demo-rules",
-            "centa-basic-grains",
+            "rotation-principle",
             "user-answers"
-          ]
-        },
-        {
-          "priority": "diversification",
-          "status": "evaluable",
-          "level": "neutral",
-          "value": null,
-          "unit": null,
-          "reason": "It is a different crop, but from the same family.",
-          "evidence": [
-            "demo-rules"
           ]
         }
       ],
       "sourceIds": [
+        "method-rules",
+        "fao-ky",
         "nasa-power",
-        "demo-rules",
-        "user-answers",
-        "centa-basic-grains"
-      ]
+        "drought-definition",
+        "centa-guides",
+        "rotation-principle",
+        "user-answers"
+      ],
+      "score": 10,
+      "blocked": false
+    },
+    {
+      "id": "sorghum-bean",
+      "role": "alternative",
+      "sequence": [
+        "sorghum",
+        "bean"
+      ],
+      "summary": "Sow beans after sorghum. The crop changes and so does the family (a cereal and a legume).",
+      "limitation": "Beans lose more yield when water is short: the Ky factor is 1.15 (FAO; above 1 = sensitive).",
+      "missingData": "Still to confirm: your soil texture (it changes how much water it holds).",
+      "criteria": [
+        {
+          "priority": "diversification",
+          "status": "evaluable",
+          "level": "favorable",
+          "value": 2,
+          "unit": "0-2",
+          "reason": "The crop changes and so does the family (a cereal and a legume).",
+          "evidence": [
+            "method-rules"
+          ]
+        },
+        {
+          "priority": "water",
+          "status": "evaluable",
+          "level": "neutral",
+          "value": 1.15,
+          "unit": "Ky",
+          "reason": "Beans lose more yield when water is short: the Ky factor is 1.15 (FAO; above 1 = sensitive). In this area, 3 of 10 years (2016–2025) had 5 or more days in a row with almost no rain in July and August (NASA POWER). Total rain is enough (1272 mm on average from May to October; CENTA gives 228 mm for the cycle): the risk is in the dry spells.",
+          "evidence": [
+            "fao-ky",
+            "nasa-power",
+            "drought-definition",
+            "centa-guides"
+          ]
+        },
+        {
+          "priority": "soil",
+          "status": "evaluable",
+          "level": "favorable",
+          "value": null,
+          "unit": null,
+          "reason": "Beans are a legume and fix nitrogen (CENTA). Sowing them after sorghum is a rotation, which also breaks pests and diseases (FAO).",
+          "evidence": [
+            "rotation-principle",
+            "centa-guides",
+            "user-answers"
+          ]
+        }
+      ],
+      "sourceIds": [
+        "method-rules",
+        "fao-ky",
+        "nasa-power",
+        "drought-definition",
+        "centa-guides",
+        "rotation-principle",
+        "user-answers"
+      ],
+      "score": 23,
+      "blocked": false
     }
   ],
+  "highlight": {
+    "scenarioId": "sorghum-bean",
+    "priority": "diversification",
+    "reason": "Sorghum → Beans is the best rated option (diversifying: helps, water: fair, soil: helps)"
+  },
+  "explanation": {
+    "consider": "To diversify, Sorghum → Beans is worth considering. The crop changes and so does the family (a cereal and a legume).",
+    "influence": "What you chose as most important (to diversify) and the past weather from NASA weighed most. In this area, 3 of 10 years (2016–2025) had 5 or more days in a row with almost no rain in July and August (NASA POWER).",
+    "caution": "Beans lose more yield when water is short: the Ky factor is 1.15 (FAO; above 1 = sensitive).",
+    "verify": "Before sowing, confirm: your soil texture (it changes how much water it holds). Also talk with an extension agent in your area.",
+    "source": "rules",
+    "model": null,
+    "fallbackReason": "not_configured"
+  },
   "sources": [
     {
       "id": "nasa-power",
-      "name": "NASA POWER Daily (MERRA-2)",
-      "note": "Rainfall (PRECTOTCORR, mm/day) and maximum temperature (T2M_MAX, °C) for May 1–7, 2024 at an approximate point in San Miguel. It is a one-week sample used to test the connection.",
-      "url": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M_MAX,T2M_MIN,PRECTOTCORR&community=AG&longitude=-88.45&latitude=13.64&start=20240501&end=20240507&format=JSON",
-      "version": "v2.10.3",
-      "kind": "nasa"
+      "name": "NASA POWER Daily API",
+      "url": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M_MAX,PRECTOTCORR&community=AG&longitude=-88.45&latitude=13.64&start=20160501&end=20251031&format=JSON",
+      "version": "v2.10.3 · MERRA2/POWER",
+      "kind": "nasa",
+      "note": "Daily rain (PRECTOTCORR, mm/day) and maximum temperature (T2M_MAX, °C) for the approximate point of the area. It describes a cell of about 50 km, not a plot."
     },
     {
-      "id": "centa-basic-grains",
-      "name": "CENTA · Basic Grains Program",
-      "note": "Local reference for maize, beans and sorghum. No value has been taken from its guides yet: page, variety and area still have to be verified.",
+      "id": "fao-ky",
+      "name": "FAO-56, Table 24, and FAO-66, Table 1: Ky factor",
+      "url": "https://www.fao.org/4/x0490e/x0490e0e.htm",
+      "version": "1998 / 2012",
+      "kind": "technical-reference",
+      "note": "Whole-season Ky (from FAO-33): maize 1.25, beans 1.15, sorghum 0.9. According to FAO-66, with Ky above 1 the crop is very sensitive to water deficit and with Ky below 1 it is more tolerant. These are general values, not measured in El Salvador."
+    },
+    {
+      "id": "centa-guides",
+      "name": "CENTA: technical guides for maize, beans and sorghum",
       "url": "https://www.centa.gob.sv/servicios/programa-granos-basicos/",
-      "version": null,
-      "kind": "local-reference"
+      "version": "2018",
+      "kind": "local-reference",
+      "note": "Maize: at least 500 to 700 mm of well distributed rain and very sensitive to waterlogging (p. 8). Beans: average use of 228 mm (p. 15), do not tolerate standing water (p. 16), fix nitrogen (p. 9) and are rotated with non-host crops against diseases (p. 30). Sorghum: 550 mm (p. 8) and very drought tolerant (p. 15). Read from archived copies of the official download links."
     },
     {
-      "id": "demo-rules",
-      "name": "Yago illustrative rules",
-      "note": "General comparisons between crops (family, water need, waterlogging) used only to show how the app will work.",
-      "url": null,
-      "version": "demo-0.1 (illustrative rules)",
-      "kind": "demo-assumption"
+      "id": "drought-definition",
+      "name": "MARN (El Salvador): meteorological drought and dry day",
+      "url": "https://www.snet.gob.sv/ver/meteorologia/clima/sequia+meteorologica/",
+      "version": null,
+      "kind": "local-reference",
+      "note": "Weak meteorological drought: 5 to 10 consecutive dry days in the rainy season; moderate: 11 to 15; strong: more than 15. Dry day: under 1 mm in 24 hours (Climatological summary for July 2023, p. 5)."
+    },
+    {
+      "id": "rotation-principle",
+      "name": "FAO: Conservation Agriculture, species diversification",
+      "url": "https://www.fao.org/conservation-agriculture/in-practice/species-diversification/en/",
+      "version": null,
+      "kind": "technical-reference",
+      "note": "Rotation prevents crop-specific pests and diseases from carrying over to the next crop and increases nitrogen fixation. The FAO Save and Grow fact sheet on maize and legumes (2015) adds that this rotation helps maintain soil fertility."
     },
     {
       "id": "user-answers",
-      "name": "What you answered",
-      "note": "The area, current crop, soil and priority you chose in the previous steps.",
+      "name": "Your answers in the form",
       "url": null,
       "version": null,
-      "kind": "user-input"
+      "kind": "user-input",
+      "note": "Soil texture and drainage as you answered. It is not checked in the field."
+    },
+    {
+      "id": "method-rules",
+      "name": "Yago method assumptions",
+      "url": null,
+      "version": null,
+      "kind": "demo-assumption",
+      "note": "Illustrative team decisions, not validated locally: the area moves to a medium lack of rain if 2 in 10 years had a dry spell and to high if half or more did; sandy soil raises it one level; a Ky of 1.2 or more counts as very sensitive; repeating the crop, changing within the family and changing family score 0, 1 and 2; the top priority decides and the others break ties."
     }
   ],
   "warnings": [
-    "Demo data: a fictitious San Miguel case with illustrative rules.",
-    "The weather is a one-week sample (May 1–7, 2024), not a season reference.",
-    "Information about your soil is missing. The comparison may change once you have it."
+    "Still to confirm: your soil texture (it changes how much water it holds).",
+    "How options are ranked: what you chose as most important decides and the rest only breaks ties. The thresholds used to classify the lack of rain are illustrative method assumptions, not values from a source."
   ],
-  "methodVersion": "demo-0.1 (illustrative rules)",
-  "highlight": {
-    "scenarioId": "maize-sorghum",
-    "priority": "water",
-    "reason": "of the two alternatives, it copes best with a lack of rain"
-  }
+  "methodVersion": "yago-reglas-0.2.0"
 }

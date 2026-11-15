@@ -1,14 +1,26 @@
 /**
  * Boundary between the backend JSON and the UI.
  *
- * Required fields (the ones in docs/CONTRATO.md) are checked, and a missing
- * one fails with a message that names it, so a contract mismatch is obvious
- * in the console. Fields this frontend proposes on top of the contract are
- * optional: when the backend does not send them yet, a safe default is used
- * and the UI simply hides that piece.
+ * Required fields are checked, and a missing one fails with a message that
+ * names it, so a contract mismatch is obvious in the console. Optional fields
+ * get a safe default and the UI simply hides that piece.
  */
 import { ApiError } from './ApiError';
-import type { Climate, CompareResponse, Criterion, Priority, Scenario, Site, Source } from './types';
+import type {
+  Climate,
+  ClimateMetric,
+  CompareResponse,
+  ComplementaryClimate,
+  ComplementaryClimateDay,
+  ComplementaryClimateReason,
+  Criterion,
+  Explanation,
+  ExplanationFallbackReason,
+  Priority,
+  Scenario,
+  Site,
+  Source,
+} from './types';
 
 type Json = Record<string, unknown>;
 
@@ -31,6 +43,7 @@ function requireString(parent: Json, key: string, path: string, where: string): 
 }
 
 const optionalString = (value: unknown): string | null => (typeof value === 'string' && value.length > 0 ? value : null);
+const numberOrNull = (value: unknown): number | null => (typeof value === 'number' && Number.isFinite(value) ? value : null);
 
 export function normalizeSites(payload: unknown, path: string): Site[] {
   if (!Array.isArray(payload)) fail(path, 'expected an array of sites');
@@ -56,7 +69,7 @@ function normalizeCriterion(item: unknown, path: string, where: string): Criteri
     priority: requireString(item, 'priority', path, where) as Criterion['priority'],
     status: item.status === 'undetermined' || level === null ? 'undetermined' : 'evaluable',
     level,
-    value: typeof item.value === 'number' ? item.value : null,
+    value: numberOrNull(item.value),
     unit: optionalString(item.unit),
     reason: optionalString(item.reason) ?? '',
     evidence: Array.isArray(item.evidence) ? (item.evidence as string[]) : [],
@@ -68,7 +81,7 @@ function normalizeScenario(item: unknown, path: string, index: number): Scenario
   if (!isObject(item)) fail(path, `${where} must be an object`);
   const sequence = requireArray(item, 'sequence', path) as Scenario['sequence'];
   const criteria = requireArray(item, 'criteria', path).map((criterion, criterionIndex) => normalizeCriterion(criterion, path, `${where}.criteria[${criterionIndex}]`));
-  // Proposed extension: without `role`, repeating the same crop is the current rotation.
+  // Without `role`, repeating the same crop is the current rotation.
   const repeatsCrop = sequence.length > 1 && sequence.every((crop) => crop === sequence[0]);
   return {
     id: requireString(item, 'id', path, where),
@@ -79,6 +92,20 @@ function normalizeScenario(item: unknown, path: string, index: number): Scenario
     missingData: optionalString(item.missingData),
     criteria,
     sourceIds: Array.isArray(item.sourceIds) ? (item.sourceIds as string[]) : Array.from(new Set(criteria.flatMap((criterion) => criterion.evidence))),
+    blocked: item.blocked === true,
+  };
+}
+
+function normalizeMetric(item: unknown, path: string, index: number): ClimateMetric {
+  if (!isObject(item)) fail(path, `climate.metrics[${index}] must be an object`);
+  return {
+    id: requireString(item, 'id', path, `climate.metrics[${index}]`) as ClimateMetric['id'],
+    value: numberOrNull(item.value),
+    unit: optionalString(item.unit) ?? '',
+    total: numberOrNull(item.total),
+    label: optionalString(item.label) ?? '',
+    reason: optionalString(item.reason),
+    sourceId: optionalString(item.sourceId) ?? '',
   };
 }
 
@@ -89,14 +116,37 @@ function normalizeClimate(value: unknown, path: string): Climate {
   const alert = isObject(value.alert) && typeof value.alert.text === 'string' ? { priority: value.alert.priority as Priority, text: value.alert.text } : null;
   return {
     status: value.status === 'available' || value.status === 'partial' ? value.status : 'unavailable',
+    kind: value.kind === 'saved-sample' ? 'saved-sample' : 'season-history',
     period: { start: optionalString(period.start) ?? '', end: optionalString(period.end) ?? '' },
+    periodLabel: optionalString(value.periodLabel) ?? '',
     coverage: { validDays: Number(coverage.validDays ?? 0), expectedDays: Number(coverage.expectedDays ?? 0) },
-    metrics: Array.isArray(value.metrics) ? (value.metrics as Climate['metrics']) : [],
+    validYears: Number(value.validYears ?? 0),
+    expectedYears: Number(value.expectedYears ?? 0),
+    metrics: Array.isArray(value.metrics) ? value.metrics.map((metric, index) => normalizeMetric(metric, path, index)) : [],
     sourceId: optionalString(value.sourceId) ?? '',
     spatialScale: optionalString(value.spatialScale),
-    cacheAgeHours: typeof value.cacheAgeHours === 'number' ? value.cacheAgeHours : null,
+    cacheAgeHours: numberOrNull(value.cacheAgeHours),
+    stale: value.stale === true,
     alert,
     note: optionalString(value.note) ?? '',
+  };
+}
+
+const FALLBACK_REASONS: ExplanationFallbackReason[] = ['not_configured', 'timeout', 'rate_limited', 'provider_error', 'invalid_output'];
+
+function normalizeExplanation(value: unknown): Explanation | null {
+  if (!isObject(value)) return null;
+  const texts = [value.consider, value.influence, value.caution, value.verify].map(optionalString);
+  if (texts.some((text) => text === null)) return null;
+  const [consider, influence, caution, verify] = texts as string[];
+  return {
+    source: value.source === 'groq' ? 'groq' : 'rules',
+    model: optionalString(value.model),
+    fallbackReason: FALLBACK_REASONS.find((reason) => reason === value.fallbackReason) ?? null,
+    consider,
+    influence,
+    caution,
+    verify,
   };
 }
 
@@ -111,9 +161,47 @@ export function normalizeCompareResponse(payload: unknown, path: string): Compar
     sources: requireArray(payload, 'sources', path) as Source[],
     warnings: Array.isArray(payload.warnings) ? (payload.warnings as string[]) : [],
     methodVersion: optionalString(payload.methodVersion) ?? '',
-    // Proposed extension: without `highlight` no card is emphasised.
     highlight: highlight
       ? { scenarioId: highlight.scenarioId as string, priority: highlight.priority as Priority, reason: optionalString(highlight.reason) ?? '' }
       : null,
+    explanation: normalizeExplanation(payload.explanation),
+  };
+}
+
+const SERVER_REASONS: ComplementaryClimateReason[] = ['not_configured', 'auth_failed', 'timeout', 'upstream_error', 'invalid_response'];
+
+export function normalizeComplementaryClimate(payload: unknown, path: string): ComplementaryClimate {
+  if (!isObject(payload)) fail(path, 'expected an object');
+  const status = requireString(payload, 'status', path, 'response');
+  if (status !== 'available' && status !== 'partial' && status !== 'unavailable') fail(path, `unknown "status": ${status}`);
+  const days = requireArray(payload, 'days', path).map((item, index): ComplementaryClimateDay => {
+    if (!isObject(item)) fail(path, `days[${index}] must be an object`);
+    return {
+      date: requireString(item, 'date', path, `days[${index}]`),
+      tMaxC: numberOrNull(item.tMaxC),
+      tMinC: numberOrNull(item.tMinC),
+      precipMm: numberOrNull(item.precipMm),
+    };
+  });
+  const coverage = isObject(payload.coverage) ? payload.coverage : {};
+  const provenance = isObject(payload.provenance) ? payload.provenance : null;
+  const reason = SERVER_REASONS.find((item) => item === payload.reason) ?? null;
+  return {
+    source: 'meteomatics',
+    status,
+    // An unavailable answer without a known reason is still shown as a provider error.
+    reason: status === 'unavailable' ? (reason ?? 'upstream_error') : null,
+    period: { start: requireString(payload, 'start', path, 'response'), end: requireString(payload, 'end', path, 'response') },
+    coverage: { validDays: Number(coverage.validDays ?? 0), expectedDays: Number(coverage.expectedDays ?? days.length) },
+    days,
+    provenance: provenance
+      ? {
+          product: optionalString(provenance.product) ?? 'Meteomatics Weather API',
+          model: optionalString(provenance.model),
+          retrievedAt: optionalString(provenance.retrievedAt),
+          timeStandard: optionalString(provenance.timeStandard),
+        }
+      : null,
+    stale: payload.stale === true,
   };
 }
