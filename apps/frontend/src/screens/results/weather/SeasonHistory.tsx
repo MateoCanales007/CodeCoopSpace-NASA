@@ -180,7 +180,7 @@ const styles = StyleSheet.create({
   statTitle: { fontFamily: fonts.bold, fontSize: 13, lineHeight: 17, letterSpacing: 0.6, textTransform: 'uppercase', color: colors.inkSoft, marginTop: 6 },
   statValue: { fontFamily: fonts.display, fontSize: 28, lineHeight: 32, letterSpacing: -0.6, color: colors.ink },
   statCaption: { fontFamily: fonts.body, fontSize: 14, lineHeight: 19, color: colors.inkSoft },
-  alert: { backgroundColor: colors.ink, borderRadius: 20, padding: 16, gap: 4, borderLeftWidth: 6, borderLeftColor: colors.maize },
+  alert: { backgroundColor: colors.ink, borderRadius: 20, padding: 18, gap: 4 },
   alertTitle: { fontFamily: fonts.bold, fontSize: 13, lineHeight: 17, letterSpacing: 0.9, textTransform: 'uppercase', color: colors.maize },
   alertText: { fontFamily: fonts.semiBold, fontSize: 17, lineHeight: 24, color: colors.ivory },
   chartCard: { backgroundColor: colors.sand, borderRadius: 26, padding: 18, gap: 10 },

@@ -116,5 +116,5 @@ const styles = StyleSheet.create({
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
   groups: { gap: 22 },
   group: { gap: 10 },
-  note: { borderLeftWidth: 3, borderLeftColor: colors.maize, paddingLeft: 12, paddingVertical: 2, marginTop: 6 },
+  note: { backgroundColor: colors.sand, borderRadius: 14, paddingHorizontal: 14, paddingVertical: 10, marginTop: 6 },
 });

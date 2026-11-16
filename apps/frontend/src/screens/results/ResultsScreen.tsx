@@ -228,7 +228,7 @@ const styles = StyleSheet.create({
   editHovered: { backgroundColor: colors.sand },
   editText: { fontFamily: fonts.bold, fontSize: 15, lineHeight: 20, color: colors.ink },
   pressed: { opacity: 0.6 },
-  note: { marginTop: 12, borderLeftWidth: 3, borderLeftColor: colors.maize, paddingLeft: 12, paddingVertical: 2 },
+  note: { marginTop: 12, backgroundColor: colors.sand, borderRadius: 14, paddingHorizontal: 14, paddingVertical: 10 },
   switchWide: { marginTop: 24, gap: 10, maxWidth: 560 },
   cards: { marginTop: 16, gap: 14 },
   cardsWide: { marginTop: 24, flexDirection: 'row', gap: 18, alignItems: 'flex-start' },

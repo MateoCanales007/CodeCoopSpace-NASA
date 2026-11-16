@@ -6,7 +6,7 @@ import { AppText, Enter, ThinkingDots } from '../../components/ui';
 import { useReducedMotion } from '../../context/ReducedMotionContext';
 import { useLoopAnimation } from '../../hooks/useLoopAnimation';
 import { useTranslation } from '../../i18n';
-import { USE_NATIVE_DRIVER, colors, fonts, images } from '../../theme';
+import { colors, fonts, images, isWeb } from '../../theme';
 import { interpolate } from '../../utils/animation';
 
 interface ExplanationCardProps {
@@ -62,6 +62,29 @@ function ThinkingMark({ active }: { active: boolean }) {
   );
 }
 
+/** Soft, low shadow on the web; a light elevation on native. */
+const elevation = isWeb
+  ? ({ boxShadow: '0 1px 2px rgba(23,26,22,0.04), 0 10px 28px rgba(23,26,22,0.07)' } as object)
+  : { elevation: 2 };
+
+/** A thin line that runs along the top edge while Yago is working. */
+function ProgressLine() {
+  const reduced = useReducedMotion();
+  const sweep = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    if (reduced) return;
+    // JS driver: it moves a percentage position.
+    const loop = Animated.loop(Animated.timing(sweep, { toValue: 1, duration: 1400, easing: Easing.inOut(Easing.cubic), useNativeDriver: false }));
+    loop.start();
+    return () => loop.stop();
+  }, [sweep, reduced]);
+  return (
+    <View pointerEvents="none" style={styles.progressTrack}>
+      <Animated.View style={[styles.progressBar, { left: reduced ? '31%' : sweep.interpolate({ inputRange: [0, 1], outputRange: ['-38%', '100%'] }) }]} />
+    </View>
+  );
+}
+
 /** Grey bars that shimmer in place of the text that is still coming. */
 function SkeletonLines() {
   const shimmer = useLoopAnimation(650);
@@ -88,7 +111,6 @@ export function ExplanationCard({ explanation, thinking, thoughts }: Explanation
   // Every new answer starts with a short "thinking" moment before it is written.
   const [readyFor, setReadyFor] = useState<string | null>(reduced ? explanation.consider : null);
   const warmingUp = readyFor !== explanation.consider;
-  const glow = useRef(new Animated.Value(0)).current;
   const showThinking = thinking || warmingUp;
   const lead = useTypewriter(explanation.consider, !showThinking);
 
@@ -110,17 +132,15 @@ export function ExplanationCard({ explanation, thinking, thoughts }: Explanation
     return () => clearInterval(timer);
   }, [showThinking, thoughts.length]);
 
-  // The yellow edge lights up while thinking.
-  useEffect(() => {
-    Animated.timing(glow, { toValue: showThinking ? 1 : 0, duration: 320, easing: Easing.out(Easing.quad), useNativeDriver: USE_NATIVE_DRIVER }).start();
-  }, [showThinking, glow]);
-
   return (
-    <View style={styles.card}>
-      <Animated.View pointerEvents="none" style={[styles.edgeGlow, { opacity: glow }]} />
+    <View style={[styles.card, elevation]}>
+      {showThinking ? <ProgressLine /> : null}
+
       <View style={styles.heading}>
         <View style={styles.headingTitle}>
-          <ThinkingMark active={showThinking} />
+          <View style={styles.markWell}>
+            <ThinkingMark active={showThinking} />
+          </View>
           <AppText variant="label" color={colors.ink}>{text.explanationTitle}</AppText>
         </View>
         <View style={[styles.chip, byAi && styles.chipAi]}>
@@ -130,11 +150,11 @@ export function ExplanationCard({ explanation, thinking, thoughts }: Explanation
       </View>
 
       {showThinking ? (
-        <View style={styles.thinkingRow} accessibilityLiveRegion="polite">
+        <View style={styles.status} accessibilityLiveRegion="polite">
+          <ThinkingDots color={colors.ink} size={6} />
           <Enter key={thought} offsetY={8} duration={360} style={styles.thoughtBox}>
             <Text style={styles.thinkingText}>{thoughts[thought] ?? text.thinking}</Text>
           </Enter>
-          <ThinkingDots color={colors.inkSoft} size={6} />
         </View>
       ) : null}
 
@@ -144,7 +164,7 @@ export function ExplanationCard({ explanation, thinking, thoughts }: Explanation
         <View style={[styles.parts, thinking && styles.stale]}>
           {PARTS.map((part, position) => (
             <Enter key={`${part}-${explanation[part]}`} delay={part === 'consider' ? 0 : 260 + position * 170} offsetY={12} duration={460}>
-              <View style={styles.part}>
+              <View style={[styles.part, position > 0 && styles.partDivided]}>
                 <Text style={styles.partLabel}>{text.explanationLabels[part]}</Text>
                 {part === 'consider' ? (
                   <Text style={styles.lead} accessibilityLabel={explanation.consider}>
@@ -157,11 +177,11 @@ export function ExplanationCard({ explanation, thinking, thoughts }: Explanation
               </View>
             </Enter>
           ))}
-          <AppText variant="small">
+          <Text style={styles.footnote}>
             {byAi
               ? text.explanationByAi(explanation.model ?? 'Groq')
               : `${text.explanationByRules}${explanation.fallbackReason ? ` ${text.explanationFallback[explanation.fallbackReason]}` : ''}`}
-          </AppText>
+          </Text>
         </View>
       )}
     </View>
@@ -169,25 +189,30 @@ export function ExplanationCard({ explanation, thinking, thoughts }: Explanation
 }
 
 const styles = StyleSheet.create({
-  card: { backgroundColor: colors.paper, borderRadius: 26, padding: 18, gap: 14, borderWidth: 1, borderColor: colors.line, borderLeftWidth: 6, borderLeftColor: colors.maize, overflow: 'hidden' },
-  edgeGlow: { position: 'absolute', left: -6, top: 0, bottom: 0, width: 26, backgroundColor: 'rgba(243,183,43,0.35)' },
+  card: { backgroundColor: colors.paper, borderRadius: 24, paddingHorizontal: 20, paddingTop: 18, paddingBottom: 20, gap: 16, borderWidth: 1, borderColor: colors.line, overflow: 'hidden' },
+  progressTrack: { position: 'absolute', top: 0, left: 0, right: 0, height: 3, backgroundColor: 'rgba(23,26,22,0.06)' },
+  progressBar: { position: 'absolute', top: 0, bottom: 0, width: '38%', borderRadius: 2, backgroundColor: colors.ink },
   heading: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' },
-  headingTitle: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  mark: { width: 30, height: 29 },
-  chip: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12, borderWidth: 1, borderColor: colors.line },
+  headingTitle: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  markWell: { width: 38, height: 38, borderRadius: 19, backgroundColor: colors.sand, alignItems: 'center', justifyContent: 'center' },
+  mark: { width: 24, height: 23 },
+  chip: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 10, paddingVertical: 5, borderRadius: 999, borderWidth: 1, borderColor: colors.line },
   chipAi: { backgroundColor: colors.ink, borderColor: colors.ink },
-  chipDot: { width: 7, height: 7, borderRadius: 4, backgroundColor: colors.maize },
+  chipDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: colors.maize },
   chipText: { fontFamily: fonts.bold, fontSize: 12, lineHeight: 16, color: colors.inkSoft },
-  thinkingRow: { flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 48 },
+  status: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 52, paddingHorizontal: 14, paddingVertical: 10, borderRadius: 16, backgroundColor: colors.ivory },
   thoughtBox: { flexShrink: 1 },
-  thinkingText: { fontFamily: fonts.semiBold, fontSize: 16, lineHeight: 22, color: colors.ink },
+  thinkingText: { fontFamily: fonts.semiBold, fontSize: 15, lineHeight: 21, color: colors.ink },
   skeleton: { gap: 12, paddingVertical: 4 },
   skeletonLine: { height: 14, borderRadius: 7, backgroundColor: colors.sand },
-  parts: { gap: 14 },
+  parts: { gap: 16 },
   stale: { opacity: 0.4 },
-  part: { gap: 2 },
-  partLabel: { fontFamily: fonts.bold, fontSize: 13, lineHeight: 17, letterSpacing: 0.9, textTransform: 'uppercase', color: colors.inkSoft },
-  lead: { fontFamily: fonts.semiBold, fontSize: 22, lineHeight: 30, color: colors.ink },
-  caret: { color: colors.maize },
-  body: { fontFamily: fonts.body, fontSize: 18, lineHeight: 26, color: colors.ink },
+  part: { gap: 4 },
+  // A hairline separates the parts instead of coloured edges.
+  partDivided: { borderTopWidth: 1, borderTopColor: colors.line, paddingTop: 16 },
+  partLabel: { fontFamily: fonts.bold, fontSize: 12, lineHeight: 16, letterSpacing: 1, textTransform: 'uppercase', color: colors.inkFaint },
+  lead: { fontFamily: fonts.semiBold, fontSize: 22, lineHeight: 30, color: colors.ink, letterSpacing: -0.2 },
+  caret: { color: colors.inkFaint },
+  body: { fontFamily: fonts.body, fontSize: 17, lineHeight: 26, color: colors.ink },
+  footnote: { fontFamily: fonts.body, fontSize: 13, lineHeight: 19, color: colors.inkFaint },
 });
