@@ -65,7 +65,10 @@ export function RootNavigator() {
       style={{
         flex: 1,
         opacity,
-        transform: [{ translateY: opacity.interpolate({ inputRange: [0, 1], outputRange: [reduced ? 0 : 14, 0] }) }],
+        transform: [
+          { translateY: opacity.interpolate({ inputRange: [0, 1], outputRange: [reduced ? 0 : 18, 0] }) },
+          { scale: opacity.interpolate({ inputRange: [0, 1], outputRange: [reduced ? 1 : 0.975, 1] }) },
+        ],
       }}
     >
       {screen === 'welcome' ? <WelcomeScreen onStart={() => navigate('wizard', () => setStep(0))} /> : null}

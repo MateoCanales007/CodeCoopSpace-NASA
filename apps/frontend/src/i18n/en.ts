@@ -1,4 +1,5 @@
-import type { ComplementaryClimateReason, CropId, ExplanationFallbackReason, Priority, SoilDrainage, SoilTexture, SourceKind } from '../api/types';
+import type { ClimateMetricId, ComplementaryClimateReason, CropId, ExplanationFallbackReason, Priority, SoilDrainage, SoilTexture, SourceKind } from '../api/types';
+import type { Condition } from '../screens/results/weather/sky';
 import type { LevelKey } from '../constants/domain';
 import type { SceneKey } from './types';
 
@@ -177,7 +178,9 @@ export const en = {
       provider_error: 'The AI service failed.',
       invalid_output: 'The AI answer did not pass the checks and was discarded.',
     } as Record<ExplanationFallbackReason, string>,
-    comparing: 'Comparing crops…',
+    comparing: 'Comparing crops',
+    loadingSteps: ['Reading ten rainy seasons of NASA data for your area…', 'Weighing your answers and what matters most to you…', 'Writing your summary…'],
+    thinking: 'Yago is thinking',
     errorTitle: 'Could not compare',
     errorText: 'Could not reach the server. Check your connection and try again.',
     retry: 'Try again',
@@ -188,6 +191,55 @@ export const en = {
       `Before, to ${previousGoal}, ${previousSequence} stood out. To ${goal}, ${reason}. The weather and your answers are the same: only how much each thing counts has changed.`,
     highlightKept: (sequence: string) => `${sequence} still stands out`,
     highlightKeptText: (goal: string, reason: string) => `Also to ${goal}: ${reason}. The weather and your answers are the same.`,
+  },
+
+  weather: {
+    hereNow: (place: string) => `Right now in ${place}`,
+    refresh: 'Refresh the weather',
+    loading: 'Looking up the weather',
+    noTemperature: 'No temperature data',
+    /** `sun`: daytime; `evening`: dawn and dusk; `night`. */
+    condition: {
+      downpour: { sun: 'A downpour is coming', evening: 'A downpour is coming', night: 'A downpour is coming' },
+      rain: { sun: 'Rain on the way', evening: 'Rain on the way', night: 'Rain tonight' },
+      drizzle: { sun: 'A light drizzle ahead', evening: 'A light drizzle ahead', night: 'A light drizzle tonight' },
+      scorching: { sun: 'Scorching sun', evening: 'Very hot', night: 'A very hot night' },
+      hot: { sun: 'Warm', evening: 'Warm', night: 'A warm night' },
+      mild: { sun: 'A pleasant day', evening: 'Pleasant out', night: 'A calm night' },
+      cool: { sun: 'Cool', evening: 'Cool', night: 'A cool night' },
+    } as Record<Condition, { sun: string; evening: string; night: string }>,
+    rainSoon: (mm: number) => `${Math.round(mm * 10) / 10} mm of rain expected in the next 6 hours.`,
+    dryNext6h: 'No rain expected in the next 6 hours.',
+    noRainData: 'No rain data for the next hours.',
+    unavailableTitle: 'No forecast right now',
+    notConfigured: 'The server does not have access to Meteomatics yet. The history below still works.',
+    unreachable: 'Meteomatics did not answer. Try refreshing in a while.',
+    next24h: 'Next 24 hours',
+    forecastTitle: 'What is coming · next 24 hours',
+    now: 'Now',
+    rainCaption: 'Bars: rain expected in the 6 hours up to each time.',
+    waterComing: 'Water coming',
+    hottest: 'Hottest',
+    in24h: 'in the next 24 hours',
+    noRain24h: 'No rain in sight for 24 hours',
+    forecastSource: (place: string) =>
+      `Now and next 24 hours: Meteomatics forecast model for an approximate point in ${place}, El Salvador time. It is context only and does not change the comparison. It may differ from what happens on your land.`,
+    historyKicker: 'NASA data · behind your comparison',
+    historyTitle: 'How the rainy season has been here',
+    historySub: (period: string) => `${period}. Past weather, not a forecast.`,
+    metricTitle: {
+      seasonRainMean: 'Rainy season rain',
+      drySpellYears: 'Dry spells',
+      tMaxMean: 'Afternoon heat',
+      precipTotal: 'Rain that week',
+      dryDays: 'Dry days',
+    } as Record<ClimateMetricId, string>,
+    seasonBarsTitle: 'Rain in each rainy season (May to October) · tap a bar',
+    seasonReadout: (mm: number, days: number) => `${mm} mm · longest dry run in July–August: ${days} ${days === 1 ? 'day' : 'days'}`,
+    meanLabel: (mm: number) => `Dashed line: average of ${mm} mm`,
+    drySpellLegend: (days: number) => `Season with ${days} or more days in a row with almost no rain in July and August`,
+    wordsNote:
+      'Words like “scorching” or “light drizzle” are Yago’s way of summing up the figures, not an official classification. The figures come from the sources shown.',
   },
 };
 

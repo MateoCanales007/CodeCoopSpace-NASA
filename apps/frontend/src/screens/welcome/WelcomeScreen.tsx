@@ -1,14 +1,13 @@
 import { useMemo } from 'react';
 import { PanResponder, StyleSheet, View, useWindowDimensions } from 'react-native';
 
-import { SCENES, SceneStage } from '../../components/scene';
+import { FloatingHalos, SCENES, SceneStage } from '../../components/scene';
 import { AppText, Button, Enter, LanguageToggle, Logo } from '../../components/ui';
 import { useReducedMotion } from '../../context/ReducedMotionContext';
 import { usePointer } from '../../hooks/usePointer';
 import { useSceneCarousel } from '../../hooks/useSceneCarousel';
 import { useTranslation } from '../../i18n';
 import { WIDE_BREAKPOINT, colors, fonts, isWeb } from '../../theme';
-import { FloatingHalos } from './FloatingHalos';
 import { SceneControl } from './SceneControl';
 
 /** Horizontal distance, in px, a swipe must travel to change the scene. */

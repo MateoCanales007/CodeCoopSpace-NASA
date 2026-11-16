@@ -12,7 +12,7 @@ from pydantic import BaseModel, field_validator
 from app import rules
 from app.evidence import CROP_FACTS, SOURCES
 from app.explain import Explanation, ExplanationText, Lang
-from app.power import DRY_DAY_MM, DRY_SPELL_DAYS, PowerClimate
+from app.power import DRY_DAY_MM, DRY_SPELL_DAYS, PowerClimate, YearSummary
 from app.rules import Drainage, Level, Priority, Stress, Texture
 from app.sites import CROPS, CropId, Site
 
@@ -82,6 +82,8 @@ class Climate(BaseModel):
     stress: Stress | None
     alert: Alert | None
     note: str
+    # Cada época lluviosa con datos completos: lluvia total y racha seca más larga de julio y agosto.
+    years: list[YearSummary] = []
 
 
 class Criterion(BaseModel):
@@ -529,6 +531,7 @@ def build_climate(lang: Lang, climate: PowerClimate, soil: Soil, now: datetime) 
         stress=stress,
         alert=alert,
         note=note,
+        years=climate.years,
     )
 
 
