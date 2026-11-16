@@ -15,6 +15,7 @@ import { ExplanationCard } from './ExplanationCard';
 import { PriorityChangeBanner } from './PriorityChangeBanner';
 import { PrioritySwitch } from './PrioritySwitch';
 import { ScenarioCard } from './ScenarioCard';
+import { analysisThoughts, loadingThoughts } from './thoughts';
 import { WeatherView } from './weather/WeatherView';
 
 interface ResultsScreenProps {
@@ -82,7 +83,11 @@ export function ResultsScreen({ site, answers, onPriorityChange, onEdit, onResta
   };
 
   if (!data) {
-    return <View style={styles.root}>{failed ? <ComparisonError onRetry={reload} /> : <ComparisonLoader />}</View>;
+    return (
+      <View style={styles.root}>
+        {failed ? <ComparisonError onRetry={reload} /> : <ComparisonLoader thoughts={loadingThoughts({ t, answers, site, priority, data: null })} />}
+      </View>
+    );
   }
 
   const highlightedId = data.highlight?.scenarioId ?? null;
@@ -150,7 +155,7 @@ export function ResultsScreen({ site, answers, onPriorityChange, onEdit, onResta
 
               {data.explanation ? (
                 <Enter delay={60} offsetY={20} style={styles.explanation}>
-                  <ExplanationCard explanation={data.explanation} thinking={loading} />
+                  <ExplanationCard explanation={data.explanation} thinking={loading} thoughts={analysisThoughts({ t, answers, site, priority, data })} />
                 </Enter>
               ) : null}
 

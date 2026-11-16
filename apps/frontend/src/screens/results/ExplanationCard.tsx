@@ -13,12 +13,16 @@ interface ExplanationCardProps {
   explanation: Explanation;
   /** true while a new comparison is on its way (for example, after changing the priority). */
   thinking: boolean;
+  /** What Yago is going through, one line at a time, built from the data of this query. */
+  thoughts: string[];
 }
 
 const PARTS = ['consider', 'influence', 'caution', 'verify'] as const;
 /** Short pause before the text starts, so the change reads as "thinking, then writing". */
-const THINK_MS = 650;
+const THINK_MS = 1100;
 const WORD_MS = 38;
+/** Each thought stays this long on screen. */
+const THOUGHT_MS = 1700;
 
 /** Writes `text` word by word, like an answer being typed. Shows it whole with reduced motion. */
 function useTypewriter(text: string, start: boolean): string {
@@ -76,7 +80,7 @@ function SkeletonLines() {
  * sowing. It "thinks" for a moment, then writes the answer, and always says
  * whether an AI model or the rules wrote the wording.
  */
-export function ExplanationCard({ explanation, thinking }: ExplanationCardProps) {
+export function ExplanationCard({ explanation, thinking, thoughts }: ExplanationCardProps) {
   const { t } = useTranslation();
   const reduced = useReducedMotion();
   const text = t.results;
@@ -96,6 +100,15 @@ export function ExplanationCard({ explanation, thinking }: ExplanationCardProps)
     const timer = setTimeout(() => setReadyFor(explanation.consider), THINK_MS);
     return () => clearTimeout(timer);
   }, [explanation.consider, reduced]);
+
+  // While thinking, the thoughts go by one after the other; the last one stays.
+  const [thought, setThought] = useState(0);
+  useEffect(() => {
+    if (!showThinking) return;
+    setThought(0);
+    const timer = setInterval(() => setThought((current) => Math.min(current + 1, thoughts.length - 1)), THOUGHT_MS);
+    return () => clearInterval(timer);
+  }, [showThinking, thoughts.length]);
 
   // The yellow edge lights up while thinking.
   useEffect(() => {
@@ -118,7 +131,9 @@ export function ExplanationCard({ explanation, thinking }: ExplanationCardProps)
 
       {showThinking ? (
         <View style={styles.thinkingRow} accessibilityLiveRegion="polite">
-          <Text style={styles.thinkingText}>{text.thinking}</Text>
+          <Enter key={thought} offsetY={8} duration={360} style={styles.thoughtBox}>
+            <Text style={styles.thinkingText}>{thoughts[thought] ?? text.thinking}</Text>
+          </Enter>
           <ThinkingDots color={colors.inkSoft} size={6} />
         </View>
       ) : null}
@@ -163,8 +178,9 @@ const styles = StyleSheet.create({
   chipAi: { backgroundColor: colors.ink, borderColor: colors.ink },
   chipDot: { width: 7, height: 7, borderRadius: 4, backgroundColor: colors.maize },
   chipText: { fontFamily: fonts.bold, fontSize: 12, lineHeight: 16, color: colors.inkSoft },
-  thinkingRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  thinkingText: { fontFamily: fonts.semiBold, fontSize: 16, lineHeight: 22, color: colors.inkSoft },
+  thinkingRow: { flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 48 },
+  thoughtBox: { flexShrink: 1 },
+  thinkingText: { fontFamily: fonts.semiBold, fontSize: 16, lineHeight: 22, color: colors.ink },
   skeleton: { gap: 12, paddingVertical: 4 },
   skeletonLine: { height: 14, borderRadius: 7, backgroundColor: colors.sand },
   parts: { gap: 14 },

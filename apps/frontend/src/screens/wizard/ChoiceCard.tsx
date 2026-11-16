@@ -31,7 +31,8 @@ export function ChoiceCard({ title, hint, icon, selected, onPress, compact = fal
   const check = useRef(new Animated.Value(selected ? 1 : 0)).current;
   const iconHop = useRef(new Animated.Value(0)).current;
   const first = useRef(true);
-  const springTo = (toValue: number) => Animated.spring(scale, { toValue, speed: 40, bounciness: 5, useNativeDriver: USE_NATIVE_DRIVER }).start();
+  // Clamped: the card never grows past its own size, so the list never cuts it at the sides.
+  const springTo = (toValue: number) => Animated.spring(scale, { toValue, speed: 40, bounciness: 5, overshootClamping: true, useNativeDriver: USE_NATIVE_DRIVER }).start();
 
   useEffect(() => {
     if (first.current) {
@@ -46,9 +47,10 @@ export function ChoiceCard({ title, hint, icon, selected, onPress, compact = fal
     Animated.timing(fill, { toValue: selected ? 1 : 0, duration: 240, useNativeDriver: false }).start();
     Animated.spring(check, { toValue: selected ? 1 : 0, speed: 14, bounciness: 14, useNativeDriver: USE_NATIVE_DRIVER }).start();
     if (selected) {
+      // It dips and springs back to its size; growing past it would be cut at the sides of the list.
       Animated.sequence([
-        Animated.timing(scale, { toValue: 1.025, duration: 120, useNativeDriver: USE_NATIVE_DRIVER }),
-        Animated.spring(scale, { toValue: 1, speed: 16, bounciness: 12, useNativeDriver: USE_NATIVE_DRIVER }),
+        Animated.timing(scale, { toValue: 0.965, duration: 110, useNativeDriver: USE_NATIVE_DRIVER }),
+        Animated.spring(scale, { toValue: 1, speed: 16, bounciness: 10, overshootClamping: true, useNativeDriver: USE_NATIVE_DRIVER }),
       ]).start();
       iconHop.setValue(0);
       Animated.sequence([

@@ -645,13 +645,17 @@ def explanation_facts(lang: Lang, request: CompareRequest, site: Site, climate: 
             ("textura_del_suelo" if es else "soil_texture"): TEXTURE_WORD[lang][request.soil.texture],
             ("drenaje" if es else "drainage"): DRAINAGE_WORD[lang][request.soil.drainage],
             ("lo_mas_importante" if es else "top_priority"): GOAL[lang][request.priorities[0]],
+            ("orden_de_importancia" if es else "priority_order"): [GOAL[lang][priority] for priority in request.priorities],
         },
         ("clima_historico" if es else "weather_history"): (
             {
                 ("fuente" if es else "source"): "NASA POWER",
                 ("periodo" if es else "period"): period_label(lang, climate),
                 ("dato" if es else "fact"): dry_spell_sentence(lang, climate),
-                ("lluvia_media_mm" if es else "mean_rain_mm"): climate.seasonRainMeanMm,
+                ("lluvia_media_del_invierno_mm" if es else "mean_rainy_season_rain_mm"): climate.seasonRainMeanMm,
+                ("lluvia_minima_y_maxima_mm" if es else "lowest_and_highest_season_rain_mm"): [climate.seasonRainMinMm, climate.seasonRainMaxMm],
+                ("maxima_promedio_c" if es else "mean_daily_high_c"): climate.tMaxMeanC,
+                ("falta_de_lluvia_en_la_zona" if es else "lack_of_rain_in_area"): {"low": tr(lang, "baja", "low"), "moderate": tr(lang, "media", "medium"), "high": tr(lang, "alta", "high")}[stress],
             }
             if stress
             else tr(lang, "sin historia suficiente para valorar el agua", "not enough history to rate water")
@@ -663,12 +667,15 @@ def explanation_facts(lang: Lang, request: CompareRequest, site: Site, climate: 
             ("motivos" if es else "reasons"): [criterion.reason for criterion in highlighted.criteria],
             ("precaucion" if es else "caution"): highlighted.limitation,
             ("es_solo_la_menos_desfavorable" if es else "is_only_the_least_unfavourable"): is_weak(highlighted),
+            ("por_que_destaca" if es else "why_it_stands_out"): first_sentence(highlighted.summary),
         },
         ("otras_opciones" if es else "other_options"): [
             {
                 ("rotacion" if es else "rotation"): sequence_text(lang, scenario.sequence),
                 ("valoraciones" if es else "ratings"): ratings(scenario),
                 ("descartada_por_encharcamiento" if es else "ruled_out_by_waterlogging"): scenario.blocked,
+                ("motivos" if es else "reasons"): [criterion.reason for criterion in scenario.criteria],
+                ("precaucion" if es else "caution"): scenario.limitation,
             }
             for scenario in scenarios
             if scenario.id != highlighted.id
